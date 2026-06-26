@@ -30,7 +30,7 @@ public class ListaAdjacencia{
     }
 
     public void agregarArista(String nodo1, String nodo2, int peso) {
-        if(!adjList.containsKey(nodo1) || !adjList.containsKey(nodo2)){
+        if(!existeNodo(nodo1) || !existeNodo(nodo2)){
             System.out.println("Error: Uno o ambos nodos no existen en la lista de adyacencia.");
             return;
         }
@@ -54,14 +54,28 @@ public class ListaAdjacencia{
 
     // Eliminaciones:
 
-    public void eliminarNodo(String nodo) { //Agregar excepcion de que el nodo no existe
-        adjList.remove(nodo);
-        for(HashMap<String, Integer> conexiones : adjList.values()) {
-            conexiones.remove(nodo);
+    public void eliminarNodo(String nodo) {
+        if(!existeNodo(nodo)){
+            System.out.println("Error: El nodo no existe en la lista de adyacencia.");
+            return;
+        }
+        else{
+            adjList.remove(nodo);
+            for(HashMap<String, Integer> conexiones : adjList.values()) {
+                conexiones.remove(nodo);
+            }
         }
     }
 
-    public void eliminarArista(String nodo1, String nodo2) { //Agregar excepcion de que los nodos no existe
+    public void eliminarArista(String nodo1, String nodo2) {
+        if(!existeNodo(nodo1) || !existeNodo(nodo2)){
+            System.out.println("Error: Uno o ambos nodos no existen en la lista de adyacencia.");
+            return;
+        }
+        if(!existeArista(nodo1, nodo2)){
+            System.out.println("Error: La arista no existe en la lista de adyacencia.");
+            return;
+        }
         adjList.get(nodo1).remove(nodo2);
         adjList.get(nodo2).remove(nodo1);
     }
@@ -70,12 +84,63 @@ public class ListaAdjacencia{
 
     // Actualizaciones:
 
-    public void actualizarPesoArista(String nodo1, String nodo2, int nuevoPeso) { //Agregar excepcion de que los nodos no existe
+    public void actualizarPesoArista(String nodo1, String nodo2, int nuevoPeso) {
+        if(!existeNodo(nodo1) || !existeNodo(nodo2)){
+            System.out.println("Error: Uno o ambos nodos no existen en la lista de adyacencia.");
+            return;
+        }
+        if(!existeArista(nodo1, nodo2)){
+            System.out.println("Error: La arista no existe en la lista de adyacencia.");
+            return;
+        }
+        if(nuevoPeso < 0){
+            System.out.println("Error: El peso de la arista no puede ser negativo.");
+            return;
+        }
         adjList.get(nodo1).replace(nodo2, nuevoPeso);
         adjList.get(nodo2).replace(nodo1, nuevoPeso);
     }
 
 
+    //Verificaciones:
+
+    public boolean existeNodo(String nodo) {
+        return adjList.containsKey(nodo);
+    }
+
+    public boolean existeArista(String nodo1, String nodo2) {
+        return adjList.get(nodo1).containsKey(nodo2);
+    }
+
+    //getters:
+
+    public HashMap<String, HashMap<String, Integer>> getAdjList() {
+        return adjList;
+    }
+
+    public HashMap<String, Integer> getConexiones(String nodo) {
+        return adjList.get(nodo);
+    }
+
+    public Integer getPesoArista(String nodo1, String nodo2) {
+        return adjList.get(nodo1).get(nodo2);
+    }
+
+    public int getGrado(String nodo) {
+        return adjList.get(nodo).size();
+    }
+
+    public Set<String> getNodos(){
+        return adjList.keySet();
+    }
+
+    public Set<String> getAristasDeUnNodo(String nodo){
+        return adjList.get(nodo).keySet();
+    }
+
+    //mostrar cosas:
+
+    
 
 
 
@@ -100,7 +165,9 @@ public class ListaAdjacencia{
         agregarArista(nodo1, nodo2, peso);
     }
 
-    public void mostrarMenuOpciones(){ //Las opcioncitas del menucito, esto solo las imprime
+    //hacer menus de eliminaciones y actualizaciones (de act solo el cambio de peso de una arista)
+
+    public void mostrarMenuOpciones(){ //Las opcioncitas del menucito, esto solo las imprime, añadir las de eliminación y actialuzación
         System.out.println("=== MENÚ DE OPCIONES ===");
         System.out.println("1. Agregar nodo");
         System.out.println("2. Agregar arista");

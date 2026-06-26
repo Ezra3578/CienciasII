@@ -138,11 +138,43 @@ public class ListaAdjacencia{
         return adjList.get(nodo).keySet();
     }
 
-    //mostrar cosas:
+    //imprimir cosas:
 
-    
+    public void imprimirListaNodos(){
+        for(String nodo : getNodos()){
+            System.out.println(nodo);
+        }
+    }
 
+    public void imprimirAristasDeUnNodo(String nodo){
+        for(String arista : getAristasDeUnNodo(nodo)){
+            System.out.println(arista);
+        }
+    }
 
+    public void imprimirPesoAristasDeUnNodo(String nodo){
+        for(String arista : getAristasDeUnNodo(nodo)){
+            System.out.println("Peso de la arista " + arista + ": " + getPesoArista(nodo, arista));
+        }
+    }
+
+    public void imprimirGradoDeUnNodo(String nodo){
+        System.out.println("Grado del nodo " + nodo + ": " + getGrado(nodo));
+    }
+
+    public void imprimirListaAdjacencia(){
+        for(String nodo : getNodos()){
+            System.out.println("Nodo: " + nodo);
+            imprimirAristasDeUnNodo(nodo);
+        }
+    }
+
+    public void imprimirConexiones(){
+        for(String nodo : getNodos()){
+            System.out.println("Nodo: " + nodo);
+            imprimirPesoAristasDeUnNodo(nodo);
+        }
+    }
 
     // *********MENUS Y COSAS DE PSEUDOINTERFAZ DE USUARIO*********
 

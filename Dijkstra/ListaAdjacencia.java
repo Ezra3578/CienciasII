@@ -30,8 +30,24 @@ public class ListaAdjacencia{
     }
 
     public void agregarArista(String nodo1, String nodo2, int peso) {
+        if(!adjList.containsKey(nodo1) || !adjList.containsKey(nodo2)){
+            System.out.println("Error: Uno o ambos nodos no existen en la lista de adyacencia.");
+            return;
+        }
+
+        else if(nodo1 == nodo2){
+            System.out.println("Error: No se puede agregar una arista entre un nodo y sí mismo.");
+            return;
+        }
+
+        else{
+            if(peso < 0){
+                System.out.println("Error: El peso de la arista no puede ser negativo.");
+                return;
+            }
         adjList.get(nodo1).put(nodo2, peso);
         adjList.get(nodo2).put(nodo1, peso);
+        }
     }
 
 

@@ -41,6 +41,11 @@ public class ListaAdjacencia{
         adjList.get(nodo2).remove(nodo1);
     }
 
+    public void actualizarPesoArista(String nodo1, String nodo2, int nuevoPeso) { //Agregar excepcion de que los nodos no existe
+        adjList.get(nodo1).replace(nodo2, nuevoPeso);
+        adjList.get(nodo2).replace(nodo1, nuevoPeso);
+    }
+
    public void menuAgregarNodo() {
     do{
         Scanner scanner = new Scanner(System.in);

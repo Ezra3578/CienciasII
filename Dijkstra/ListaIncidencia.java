@@ -1,4 +1,4 @@
-package com.example;
+//package com.example;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -281,15 +281,24 @@ public class ListaIncidencia {
 
             System.out.println();
             switch (opcion) {
-                case 1  -> menuAgregarArista();
-                case 2  -> menuEliminarArista();
-                case 3  -> menuEliminarNodo();
-                case 4  -> menuActualizarPeso();
-                case 5  -> menuConsultarVecinos();
-                case 6  -> menuConsultarPeso();
-                case 7  -> mostrarEstadoGrafo();
-                case 0  -> System.out.println("Saliendo del programa...");
-                default -> System.out.println("Opción no válida. Intente de nuevo.");
+                case 1: menuAgregarArista();
+                        break;
+                case 2: menuEliminarArista();
+                        break;
+                case 3: menuEliminarNodo();
+                        break;
+                case 4: menuActualizarPeso();
+                        break;
+                case 5: menuConsultarVecinos();
+                        break;
+                case 6: menuConsultarPeso();
+                        break;
+                case 7: mostrarEstadoGrafo();
+                        break;
+                case 0: System.out.println("Saliendo del programa...");
+                        break;
+                default: System.out.println("Opción no válida. Intente de nuevo.");
+                        break;
             }
         } while (opcion != 0);
 

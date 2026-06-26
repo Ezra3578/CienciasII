@@ -179,11 +179,12 @@ public class ListaAdjacencia{
     // *********MENUS Y COSAS DE PSEUDOINTERFAZ DE USUARIO*********
 
    public void menuAgregarNodo() {
+    String nodo;
     do{
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Ingrese el nombre del nodo: ");
-        String nodo = scanner.nextLine();       
-       }while(!agregarNodo(nodo);) //tomar con pinzas, tal vez esto de acá pueda dar fallos
+        System.out.print("Ingrese el nombre del nodo: "); 
+        nodo=scanner.nextLine();     
+       }while(!agregarNodo(nodo)); //tomar con pinzas, tal vez esto de acá pueda dar fallos
    }
 
    public void menuAgregarArista() { //ponerle excepciones como que nos nodos no existen, los ponderados son negativos etc

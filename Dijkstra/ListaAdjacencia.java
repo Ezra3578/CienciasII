@@ -29,6 +29,18 @@ public class ListaAdjacencia{
         adjList.get(nodo2).put(nodo1, peso);
     }
 
+    public void eliminarNodo(String nodo) { //Agregar excepcion de que el nodo no existe
+        adjList.remove(nodo);
+        for(HashMap<String, Integer> conexiones : adjList.values()) {
+            conexiones.remove(nodo);
+        }
+    }
+
+    public void eliminarArista(String nodo1, String nodo2) { //Agregar excepcion de que los nodos no existe
+        adjList.get(nodo1).remove(nodo2);
+        adjList.get(nodo2).remove(nodo1);
+    }
+
    public void menuAgregarNodo() {
     do{
         Scanner scanner = new Scanner(System.in);

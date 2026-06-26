@@ -286,7 +286,7 @@ public class MatrizIncidencia {
     return indice;
     }
 
-    // MAIN DE PRUEBA
+    /*// MAIN DE PRUEBA
     public static void main(String[] args) {
 
         String[] ciudades = {"Bogota","Medellin","Cali", "Villavicencio"};
@@ -319,5 +319,5 @@ public class MatrizIncidencia {
         
         grafo.mostrarMatriz();
         System.out.println(grafo.obtenerIndiceVertice("Cartagena"));
-    }
+    }*/
 }

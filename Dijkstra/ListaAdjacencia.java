@@ -12,6 +12,11 @@ public class ListaAdjacencia{
         this.adjList = new HashMap<>();
     }
 
+
+    // *********FUNCIONES DE NODOS Y ARISTAS*********
+
+    //Agregaciones:
+
     public boolean agregarNodo(String nodo) {
         if(!adjList.containsKey(nodo)){
             adjList.put(nodo, new HashMap<>());
@@ -29,6 +34,10 @@ public class ListaAdjacencia{
         adjList.get(nodo2).put(nodo1, peso);
     }
 
+
+
+    // Eliminaciones:
+
     public void eliminarNodo(String nodo) { //Agregar excepcion de que el nodo no existe
         adjList.remove(nodo);
         for(HashMap<String, Integer> conexiones : adjList.values()) {
@@ -41,10 +50,20 @@ public class ListaAdjacencia{
         adjList.get(nodo2).remove(nodo1);
     }
 
+
+
+    // Actualizaciones:
+
     public void actualizarPesoArista(String nodo1, String nodo2, int nuevoPeso) { //Agregar excepcion de que los nodos no existe
         adjList.get(nodo1).replace(nodo2, nuevoPeso);
         adjList.get(nodo2).replace(nodo1, nuevoPeso);
     }
+
+
+
+
+
+    // *********MENUS Y COSAS DE PSEUDOINTERFAZ DE USUARIO*********
 
    public void menuAgregarNodo() {
     do{

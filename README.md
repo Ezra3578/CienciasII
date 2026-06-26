@@ -1,6 +1,6 @@
 # CienciasII
 
-##Integrantes Grupo
+## Integrantes Grupo
 
 - Daniel Orlando Villescas Mora
 - Erick Santiago Buitrago Peña

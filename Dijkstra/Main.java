@@ -1,8 +1,3 @@
-import ListaAdjacencia;
-import ListaIncidencia;
-import MatrizAdyacencia;
-import MatrizIncidencia;
-
 public class Main {
     public static void main(String[] args) {
         // ================================

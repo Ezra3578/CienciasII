@@ -1,7 +1,6 @@
-import java.util.HashMap;
 import java.util.*;
 
-public class ListaAdjacencia{
+public class ListaAdjacencia implements RepresentacionGrafo{
 
     //ESTRUCTURA DE ESTE COSO
     //{nodo con conexión: {nodo conectado: peso} }
@@ -17,18 +16,18 @@ public class ListaAdjacencia{
 
     //Agregaciones:
 
-    public boolean agregarNodo(String nodo) {
+    @Override
+    public void agregarNodo(String nodo) {
         if(!adjList.containsKey(nodo)){
             adjList.put(nodo, new HashMap<>());
-            return true;
         }
         else{
             System.out.println("Error: El nodo ya existe en la lista de adyacencia.");
-            return false;
         }
 
     }
 
+    @Override
     public void agregarArista(String nodo1, String nodo2, int peso) {
         if(!existeNodo(nodo1) || !existeNodo(nodo2)){
             System.out.println("Error: Uno o ambos nodos no existen en la lista de adyacencia.");
@@ -54,6 +53,7 @@ public class ListaAdjacencia{
 
     // Eliminaciones:
 
+    @Override
     public void eliminarNodo(String nodo) {
         if(!existeNodo(nodo)){
             System.out.println("Error: El nodo no existe en la lista de adyacencia.");
@@ -67,6 +67,8 @@ public class ListaAdjacencia{
         }
     }
 
+
+    @Override
     public void eliminarArista(String nodo1, String nodo2) {
         if(!existeNodo(nodo1) || !existeNodo(nodo2)){
             System.out.println("Error: Uno o ambos nodos no existen en la lista de adyacencia.");
@@ -84,6 +86,7 @@ public class ListaAdjacencia{
 
     // Actualizaciones:
 
+    @Override
     public void actualizarPesoArista(String nodo1, String nodo2, int nuevoPeso) {
         if(!existeNodo(nodo1) || !existeNodo(nodo2)){
             System.out.println("Error: Uno o ambos nodos no existen en la lista de adyacencia.");
@@ -104,10 +107,13 @@ public class ListaAdjacencia{
 
     //Verificaciones:
 
+
+    @Override
     public boolean existeNodo(String nodo) {
         return adjList.containsKey(nodo);
     }
 
+    @Override
     public boolean existeArista(String nodo1, String nodo2) {
         return adjList.get(nodo1).containsKey(nodo2);
     }
@@ -180,11 +186,12 @@ public class ListaAdjacencia{
 
    public void menuAgregarNodo() {
     String nodo;
-    do{
+    //do{
         Scanner scanner = new Scanner(System.in);
         System.out.print("Ingrese el nombre del nodo: "); 
-        nodo=scanner.nextLine();     
-       }while(!agregarNodo(nodo)); //tomar con pinzas, tal vez esto de acá pueda dar fallos
+        nodo=scanner.nextLine();
+        agregarNodo(nodo);     
+       //}while(me da pereza corregir una condición aca, pq cambié agregarNodo de boolean a void); //tomar con pinzas, tal vez esto de acá pueda dar fallos
    }
 
    public void menuAgregarArista() { //ponerle excepciones como que nos nodos no existen, los ponderados son negativos etc

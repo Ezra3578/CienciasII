@@ -14,7 +14,18 @@ public class Main {
             e.printStackTrace();
         }
         System.out.println(ma.mostrarMatriz());
+        AlgoritmoDistanciaMasCorta dijkstra = new Dijkstra(grafo);
 
+        // Calcular desde A
+        dijkstra.calcularDistanciaMasCorta("A");
+
+        System.out.println(dijkstra.getDistancia("A"));
+        System.out.println(dijkstra.getDistancia("A", "C"));
+        System.out.println(dijkstra.getCamino("A"));
+        System.out.println(dijkstra.getCamino("A", "C"));
+
+        // Probar también con nodo destino que no existe
+        System.out.println(dijkstra.getDistancia("A", "Z"));
         // ================================
         // 2. MATRIZ DE INCIDENCIA
         // ================================

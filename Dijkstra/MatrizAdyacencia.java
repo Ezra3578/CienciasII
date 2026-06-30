@@ -16,6 +16,16 @@ public class MatrizAdyacencia {
         this.nodos = new HashMap<>();
         this.matriz = new ArrayList<>();
     }
+    public ArrayList<String> getListaNodos() {
+    return matriz;
+    }
+
+    public HashMap<String, HashMap<String, Integer>> getNodosMapa() {
+        return nodos;
+    }
+    public boolean existeNodo(String nodo) {
+        return this.nodos.containsKey(nodo);
+    }
 
     // método recibe una arista con el par de nodos que invilucra y el peso
     public void crearNodoYValor(String nodo1, String nodo2, Integer peso) throws Exception {

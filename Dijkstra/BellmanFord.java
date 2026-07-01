@@ -56,6 +56,16 @@ public class BellmanFord implements AlgoritmoDistanciaMasCorta {
                 }
             }
         }
+
+        // detección de ciclos negativos
+        for(String nodo : grafo.getNodos().keySet()) {
+            for(String vecino : grafo.getNodos().get(nodo).keySet()) {
+                int distanciaCandidata = distancias.get(nodo) + grafo.getNodos().get(nodo).get(vecino);
+                if(distanciaCandidata < distancias.get(vecino)) {
+                    throw new RuntimeException("El grafo contiene un ciclo negativo");
+                }
+            }
+        }
     }
 
     @Override

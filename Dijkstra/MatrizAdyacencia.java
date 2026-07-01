@@ -1,4 +1,3 @@
-import interfaces.RepresentacionGrafo;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -13,15 +12,9 @@ public class MatrizAdyacencia implements RepresentacionGrafo {
         this.nodos = new HashMap<>();
         this.matriz = new ArrayList<>();
     }
-    public ArrayList<String> getListaNodos() {
-    return matriz;
-    }
 
     public HashMap<String, HashMap<String, Integer>> getNodosMapa() {
         return nodos;
-    }
-    public boolean existeNodo(String nodo) {
-        return this.nodos.containsKey(nodo);
     }
 
     // ── Métodos de la interface ──────────────────────────────────────────────

@@ -47,7 +47,7 @@ public class Main {
         // 3. LISTA DE ADYACENCIA
         // ================================
         System.out.println("\n===== LISTA DE ADYACENCIA =====");
-        ListaAdjacencia la = new ListaAdjacencia();
+        ListaAdyacencia la = new ListaAdyacencia();
         la.agregarNodo("A");
         la.agregarNodo("B");
         la.agregarNodo("C");

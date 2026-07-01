@@ -7,9 +7,9 @@ public class Main {
         MatrizAdyacencia ma = new MatrizAdyacencia();
         try {
             ma.agregarArista("A", "B", 2);
-            ma.agregarArista("A", "C", 4);
-            ma.agregarArista("B", "C", 1);
-            ma.agregarArista("B", "D", 3);
+            ma.agregarArista("B", "C", 3);
+            ma.agregarArista("C", "D", 4);
+            ma.agregarArista("D", "A", -10);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -55,7 +55,7 @@ public class Main {
         la.agregarArista("A", "B", 2);
         la.agregarArista("A", "C", 4);
         la.agregarArista("B", "C", 1);
-        la.agregarArista("B", "D", 3);
+        la.agregarArista("B", "F", 3);
         la.imprimirConexiones();  // muestra cada nodo y sus pesos
 
         // ================================
@@ -76,23 +76,34 @@ public class Main {
         System.out.println("\n===== FLOYD–WARSHALL =====");
         FloydWarshall fw = new FloydWarshall(ma);
 
-        // Calcula todas las distancias mínimas
-        fw.calcularDistanciaMasCorta("A");
 
-        // Distancias desde A hacia todos
-        System.out.println(fw.getDistancia("A"));
+        try {
+            fw.calcularDistanciaMasCorta("A");
+            
+            // Calcula todas las distancias mínimas
+            fw.calcularDistanciaMasCorta("A");
+            
+            // Distancias desde A hacia todos
+            System.out.println(fw.getDistancia("A"));
 
-        // Distancia específica A → D
-        System.out.println("Distancia A -> D = " + fw.getDistancia("A", "D"));
+            // Distancia específica A → D
+            System.out.println("Distancia A -> D = " + fw.getDistancia("A", "D"));
 
-        // Camino completo desde A hacia todos
-        System.out.println(fw.getCamino("A"));
+            // Camino completo desde A hacia todos
+            System.out.println(fw.getCamino("A"));
 
-        // Camino específico A → D
-        System.out.println("Camino A -> D = " + fw.getCamino("A", "D"));
+            // Camino específico A → D
+            System.out.println("Camino A -> D = " + fw.getCamino("A", "D"));
 
-        //Cantidad de pasos de FloydWharshall
-        System.out.println("La cantidad de pasos de FloydWharshall es: "+fw.getPasos());
+            //Cantidad de pasos de FloydWharshall
+            System.out.println("La cantidad de pasos de FloydWharshall es: "+fw.getPasos());
+
+        } catch (IllegalStateException e) {
+            // Avisa del error en Floyd-Warshall pero NO detiene el Main
+            System.err.println(e.getMessage());
+        }
+        
+
 
         // ===================================
         // 6. BELLMAN-FORD

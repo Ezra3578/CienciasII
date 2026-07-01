@@ -25,6 +25,8 @@ public class Main {
         System.out.println(dijkstra.getCamino("A"));
         System.out.println("Caminos desde nodo A a C:");
         System.out.println(dijkstra.getCamino("A", "C"));
+        //Conteo de pasos en matrix 4X4
+        System.out.println("La cantidad de pasos de Djikstra es: "+dijkstra.getPasos());
 
         // Probar también con nodo destino que no existe
         System.out.println("Prueba de error con una distancia entre nodo A y uno do que no existe:");

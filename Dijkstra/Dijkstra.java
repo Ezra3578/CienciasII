@@ -4,11 +4,13 @@ public class Dijkstra implements AlgoritmoDistanciaMasCorta {
     private MatrizAdyacencia grafo;
     private HashMap<String, HashMap<String, Integer>> distanciasPorOrigen;
     private HashMap<String, HashMap<String, String>> predecesoresPorOrigen;
+    private int pasos;
     
     Dijkstra(MatrizAdyacencia grafo) {
         this.grafo = grafo;
         this.distanciasPorOrigen = new HashMap<>();
         this.predecesoresPorOrigen = new HashMap<>();
+        this.pasos=0;
     }
 
     @Override
@@ -16,6 +18,7 @@ public class Dijkstra implements AlgoritmoDistanciaMasCorta {
         HashMap<String, Integer> distancias = new HashMap<>();
         HashMap<String, Boolean> visitados = new HashMap<>();
         HashMap<String, String> predecesores = new HashMap<>();
+        pasos=0;
         for (String nodo : grafo.getListaNodos()) {
             distancias.put(nodo, Integer.MAX_VALUE);
             visitados.put(nodo, false);
@@ -34,6 +37,7 @@ public class Dijkstra implements AlgoritmoDistanciaMasCorta {
                     distancia_min=distancias.get(nodo);
                     nodo_menor=nodo;
                 }
+                pasos++;
             }
             if(nodo_menor==null){
                 break;
@@ -112,6 +116,10 @@ public class Dijkstra implements AlgoritmoDistanciaMasCorta {
         }
         calcularDistanciaMasCorta(nodo_inicial);
         return reconstruirCamino(nodo_inicial, nodo_destino);
+    }
+    @Override
+    public int getPasos(){
+        return pasos;
     }
     private String reconstruirCamino(String nodo_inicial, String nodo_destino) {
         HashMap<String, Integer> distancias = distanciasPorOrigen.get(nodo_inicial);

@@ -35,9 +35,9 @@ public class MatrizAdyacencia implements RepresentacionGrafo {
     }
 
     @Override
-    public void eliminarNodo(String nombre_nodo) throws Exception {
+    public void eliminarNodo(String nombre_nodo){
         if (!existeNodo(nombre_nodo)) {
-            throw new Exception("El nodo '" + nombre_nodo + "' no existe");
+            throw new IllegalArgumentException("El nodo '" + nombre_nodo + "' no existe");
         }
 
         //en vecino agarra las claves del hashmap interno de la clave nombre_nodo del hasmap externo
@@ -128,5 +128,13 @@ public class MatrizAdyacencia implements RepresentacionGrafo {
         }
 
         return salida.toString();
+    }
+
+    public ArrayList<String> getListaNodos() {
+        return matriz;
+    }
+
+    public int getPeso(String nodo1, String nodo2) {
+        return nodos.get(nodo1).get(nodo2);
     }
 }

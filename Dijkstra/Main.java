@@ -6,10 +6,10 @@ public class Main {
         System.out.println("===== MATRIZ DE ADYACENCIA =====");
         MatrizAdyacencia ma = new MatrizAdyacencia();
         try {
-            ma.crearNodoYValor("A", "B", 2);
-            ma.crearNodoYValor("A", "C", 4);
-            ma.crearNodoYValor("B", "C", 1);
-            ma.crearNodoYValor("B", "D", 3);
+            ma.agregarArista("A", "B", 2);
+            ma.agregarArista("A", "C", 4);
+            ma.agregarArista("B", "C", 1);
+            ma.agregarArista("B", "D", 3);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -63,5 +63,27 @@ public class Main {
         li.agregar("B", "C", 1);
         li.agregar("B", "D", 3);
         li.mostrarEstadoGrafo();
+
+
+        // ================================
+        // 5. FLOYD–WARSHALL
+        // ================================
+        System.out.println("\n===== FLOYD–WARSHALL =====");
+        FloydWarshall fw = new FloydWarshall(ma);
+
+        // Calcula todas las distancias mínimas
+        fw.calcularDistanciaMasCorta("A");
+
+        // Distancias desde A hacia todos
+        System.out.println(fw.getDistancia("A"));
+
+        // Distancia específica A → D
+        System.out.println("Distancia A -> D = " + fw.getDistancia("A", "D"));
+
+        // Camino completo desde A hacia todos
+        System.out.println(fw.getCamino("A"));
+
+        // Camino específico A → D
+        System.out.println("Camino A -> D = " + fw.getCamino("A", "D"));
     }
 }

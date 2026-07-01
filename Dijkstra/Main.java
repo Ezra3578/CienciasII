@@ -14,8 +14,8 @@ public class Main {
             e.printStackTrace();
         }
         System.out.println(ma.mostrarMatriz());
+        System.out.println("===== Dijsktra =====");
         AlgoritmoDistanciaMasCorta dijkstra = new Dijkstra(grafo);
-
         // Calcular desde A
         dijkstra.calcularDistanciaMasCorta("A");
 

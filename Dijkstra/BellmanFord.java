@@ -7,15 +7,18 @@ public class BellmanFord implements AlgoritmoDistanciaMasCorta {
 
     MatrizAdyacencia grafo;
     Map<String, Integer> distancias;
+    private int pasos;
 
     // <nodo actual, nodo anterior> más corto desde el nodo inicial
     Map<String, String> predecesores;
+
 
 
     public BellmanFord(MatrizAdyacencia grafo) {
         this.grafo = grafo;
         this.distancias = new java.util.HashMap<>();
         this.predecesores = new java.util.HashMap<>();
+        this.pasos = 0;
 
         for(String nodo : grafo.getMatriz()) {
             distancias.put(nodo, Integer.MAX_VALUE);
@@ -39,6 +42,8 @@ public class BellmanFord implements AlgoritmoDistanciaMasCorta {
 
                 //bucle de los vecinos del nodo exterior
                 for(String vecino : grafo.getNodos().get(nodo).keySet()) {
+                    //cantidad de veces que ejecutó este for -> cantidad de pasos
+                    this.pasos++;
                     //si la distancia acumulada entre el nodo inicial y el "nodo" + la distancia entre el "nodo" y el "vecino" es
                     //menor que la distancia actual desde el nodo inicial hasta el "vecino", pues actualice esa distancia porque es menor
                     int distanciaCandidata = distancias.get(nodo) + grafo.getNodos().get(nodo).get(vecino);
@@ -94,5 +99,11 @@ public class BellmanFord implements AlgoritmoDistanciaMasCorta {
 
         Collections.reverse(camino); // se armó al revés (destino → inicio), toca invertirlo
         return String.join(" -> ", camino);
+    }
+
+
+    @Override
+    public int getPasos() {
+        return pasos;
     }
 }

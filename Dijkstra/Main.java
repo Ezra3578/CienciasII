@@ -110,8 +110,8 @@ public class Main {
         // obtener la distancia más corta entre A y D
         System.out.println(algoritmoBellmanFord.getDistancia("A", "D"));
 
-        //obtener el camino más corto desde el nodo inicial "A" hasta el nodo destino "E"
-        System.out.println(algoritmoBellmanFord.getCamino("A", "E"));
+        //obtener el camino más corto desde el nodo inicial "A" hasta el nodo destino "D"
+        System.out.println(algoritmoBellmanFord.getCamino("A", "D"));
 
         //obtener todos los caminos más cortos desde el nodo inicial "A" hasta cualquier otro nodo
         System.out.println(algoritmoBellmanFord.getCamino("A"));

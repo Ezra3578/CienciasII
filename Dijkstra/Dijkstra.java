@@ -19,7 +19,7 @@ public class Dijkstra implements AlgoritmoDistanciaMasCorta {
         HashMap<String, Boolean> visitados = new HashMap<>();
         HashMap<String, String> predecesores = new HashMap<>();
         pasos=0;
-        for (String nodo : grafo.getListaNodos()) {
+        for (String nodo : grafo.getMatriz()) {
             distancias.put(nodo, Integer.MAX_VALUE);
             visitados.put(nodo, false);
             predecesores.put(nodo, null);
@@ -27,12 +27,12 @@ public class Dijkstra implements AlgoritmoDistanciaMasCorta {
 
         distancias.put(nodo_inicial, 0);
 
-        int tamano = grafo.getListaNodos().size();
+        int tamano = grafo.getMatriz().size();
         //seleccionar nodo con distancia menor 
         for (int iter = 0; iter < tamano; iter++) {
             int distancia_min=Integer.MAX_VALUE;
             String nodo_menor =null;
-            for (String nodo : grafo.getListaNodos()) {
+            for (String nodo : grafo.getMatriz()) {
                 if(!visitados.get(nodo) && distancias.get(nodo) < distancia_min){
                     distancia_min=distancias.get(nodo);
                     nodo_menor=nodo;
@@ -44,7 +44,7 @@ public class Dijkstra implements AlgoritmoDistanciaMasCorta {
             }
             visitados.put(nodo_menor,true);
             //revisar si es la menor distancia
-            for (Map.Entry<String, Integer> nodo_entrada : grafo.getNodosMapa().get(nodo_menor).entrySet()){
+            for (Map.Entry<String, Integer> nodo_entrada : grafo.getNodos().get(nodo_menor).entrySet()){
                 String nodoComparacion=nodo_entrada.getKey();
                 int peso=nodo_entrada.getValue();
                 if(!visitados.get(nodoComparacion)){
@@ -69,7 +69,7 @@ public class Dijkstra implements AlgoritmoDistanciaMasCorta {
         HashMap<String, Integer> distancias = distanciasPorOrigen.get(nodo_inicial);
         String resultado = "Distancias desde el nodo " + nodo_inicial + ":\n";
 
-        for (String nodo : grafo.getListaNodos()) {
+        for (String nodo : grafo.getMatriz()) {
             int dist = distancias.get(nodo);
             if (dist == Integer.MAX_VALUE) {
                 resultado = resultado + nodo + ": INFINITO (no alcanzable)\n";
@@ -102,7 +102,7 @@ public class Dijkstra implements AlgoritmoDistanciaMasCorta {
         }
         calcularDistanciaMasCorta(nodo_inicial);
         String stringCamino="";
-        for (String nodo : grafo.getListaNodos()) {
+        for (String nodo : grafo.getMatriz()) {
             if (nodo.equals(nodo_inicial)) continue;
                 stringCamino = stringCamino + nodo_inicial + " -> " + nodo + ": "+ reconstruirCamino(nodo_inicial, nodo) + "\n";
         }

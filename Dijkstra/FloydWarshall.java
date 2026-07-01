@@ -6,6 +6,7 @@ public class FloydWarshall implements AlgoritmoDistanciaMasCorta {
     private int[][] dist;
     private int[][] next;
     private static final int INF = (int)1e8;
+    private int pasos; 
 
     public FloydWarshall(MatrizAdyacencia grafo) {
         this.grafo = grafo;
@@ -13,8 +14,11 @@ public class FloydWarshall implements AlgoritmoDistanciaMasCorta {
 
     @Override
     public void calcularDistanciaMasCorta(String nodo_inicial) {
+        //Inicializar el contador en cero
+        this.pasos = 0;
+
         // Paso 1: construir matriz de adyacencia
-        List<String> nodos = grafo.getListaNodos(); // necesitas un getter en MatrizAdyacencia
+        List<String> nodos = grafo.getMatriz(); // necesitas un getter en MatrizAdyacencia
         int V = nodos.size();
         dist = new int[V][V];
         next = new int[V][V];
@@ -37,6 +41,9 @@ public class FloydWarshall implements AlgoritmoDistanciaMasCorta {
         for (int k = 0; k < V; k++) {
             for (int i = 0; i < V; i++) {
                 for (int j = 0; j < V; j++) {
+
+                    //Se cuentan los pasos del algoritmo principal
+                    this.pasos++;
                     if (dist[i][k] + dist[k][j] < dist[i][j]) {
                         dist[i][j] = dist[i][k] + dist[k][j];
                         next[i][j] = next[i][k];
@@ -49,7 +56,7 @@ public class FloydWarshall implements AlgoritmoDistanciaMasCorta {
     @Override
     public String getDistancia(String nodo_inicial) {
         // devuelve todas las distancias desde nodo_inicial
-        List<String> nodos = grafo.getListaNodos();
+        List<String> nodos = grafo.getMatriz();
         int idx = nodos.indexOf(nodo_inicial);
         StringBuilder sb = new StringBuilder();
         for (int j = 0; j < nodos.size(); j++) {
@@ -63,7 +70,7 @@ public class FloydWarshall implements AlgoritmoDistanciaMasCorta {
 
     @Override
     public String getDistancia(String nodo_inicial, String nodo_destino) {
-        List<String> nodos = grafo.getListaNodos();
+        List<String> nodos = grafo.getMatriz();
         int i = nodos.indexOf(nodo_inicial);
         int j = nodos.indexOf(nodo_destino);
         return dist[i][j] == INF ? "No hay camino" : String.valueOf(dist[i][j]);
@@ -72,7 +79,7 @@ public class FloydWarshall implements AlgoritmoDistanciaMasCorta {
     @Override
     public String getCamino(String nodo_inicial) {
         // ejemplo: mostrar caminos desde nodo_inicial a todos
-        List<String> nodos = grafo.getListaNodos();
+        List<String> nodos = grafo.getMatriz();
         int i = nodos.indexOf(nodo_inicial);
         StringBuilder sb = new StringBuilder();
         for (int j = 0; j < nodos.size(); j++) {
@@ -86,7 +93,7 @@ public class FloydWarshall implements AlgoritmoDistanciaMasCorta {
 
     @Override
     public String getCamino(String nodo_inicial, String nodo_destino) {
-        List<String> nodos = grafo.getListaNodos();
+        List<String> nodos = grafo.getMatriz();
         int i = nodos.indexOf(nodo_inicial);
         int j = nodos.indexOf(nodo_destino);
         return reconstruirCamino(i, j, nodos);
@@ -102,4 +109,10 @@ public class FloydWarshall implements AlgoritmoDistanciaMasCorta {
         }
         return String.join(" -> ", camino);
     }
+
+    @Override
+    public int getPasos() {
+        return this.pasos;
+    }
+
 }

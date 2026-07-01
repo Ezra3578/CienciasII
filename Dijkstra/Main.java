@@ -21,10 +21,13 @@ public class Main {
 
         System.out.println(dijkstra.getDistancia("A"));
         System.out.println(dijkstra.getDistancia("A", "C"));
+        System.out.println("Caminos desde nodo A:");
         System.out.println(dijkstra.getCamino("A"));
+        System.out.println("Caminos desde nodo A a C:");
         System.out.println(dijkstra.getCamino("A", "C"));
 
         // Probar también con nodo destino que no existe
+        System.out.println("Prueba de error con una distancia entre nodo A y uno do que no existe:");
         System.out.println(dijkstra.getDistancia("A", "Z"));
         // ================================
         // 2. MATRIZ DE INCIDENCIA

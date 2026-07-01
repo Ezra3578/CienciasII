@@ -90,5 +90,9 @@ public class Main {
 
         // Camino específico A → D
         System.out.println("Camino A -> D = " + fw.getCamino("A", "D"));
+
+        //Cantidad de pasos de FloydWharshall
+        System.out.println("La cantidad de pasos de FloydWharshall es: "+fw.getPasos());
+
     }
 }

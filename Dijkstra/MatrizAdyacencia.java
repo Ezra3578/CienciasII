@@ -1,3 +1,5 @@
+import interfaces.RepresentacionGrafo;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -5,19 +7,13 @@ public class MatrizAdyacencia implements RepresentacionGrafo {
 
     private HashMap<String, HashMap<String, Integer>> nodos;
 
-    // sigue siendo el "almacén de claves" ordenado por inserción
+    // almacén de claves
     private ArrayList<String> matriz;
 
     public MatrizAdyacencia() {
         this.nodos = new HashMap<>();
         this.matriz = new ArrayList<>();
     }
-
-    public HashMap<String, HashMap<String, Integer>> getNodosMapa() {
-        return nodos;
-    }
-
-    // ── Métodos de la interface ──────────────────────────────────────────────
 
     @Override
     public void agregarNodo(String nombre_nodo) {
@@ -28,9 +24,9 @@ public class MatrizAdyacencia implements RepresentacionGrafo {
     }
 
     @Override
-    public void eliminarNodo(String nombre_nodo){
+    public void eliminarNodo(String nombre_nodo) throws Exception {
         if (!existeNodo(nombre_nodo)) {
-            throw new IllegalArgumentException("El nodo '" + nombre_nodo + "' no existe");
+            throw new Exception("El nodo '" + nombre_nodo + "' no existe");
         }
 
         //en vecino agarra las claves del hashmap interno de la clave nombre_nodo del hasmap externo
@@ -97,6 +93,7 @@ public class MatrizAdyacencia implements RepresentacionGrafo {
         return !existeArista(nodo1, nodo2);
     }
 
+
     public String mostrarMatriz() {
         StringBuilder salida = new StringBuilder();
 
@@ -123,11 +120,12 @@ public class MatrizAdyacencia implements RepresentacionGrafo {
         return salida.toString();
     }
 
-    public ArrayList<String> getListaNodos() {
+    public ArrayList<String> getMatriz() {
         return matriz;
     }
 
-    public int getPeso(String nodo1, String nodo2) {
-        return nodos.get(nodo1).get(nodo2);
+    public HashMap<String, HashMap<String, Integer>> getNodos() {
+        return nodos;
     }
+
 }

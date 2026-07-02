@@ -1,13 +1,13 @@
 import java.util.*;
 
-public class ListaAdjacencia implements RepresentacionGrafo{
+public class ListaAdyacencia implements RepresentacionGrafo{
 
     //ESTRUCTURA DE ESTE COSO
     //{nodo con conexión: {nodo conectado: peso} }
                 //Ejemplo: {"A": {"B": 5, "C": 10}, "B": {"A": 5, "C": 3}, "C": {"A": 10, "B": 3}}
     private HashMap<String, HashMap<String, Integer>> adjList;
 
-    ListaAdjacencia(){
+    ListaAdyacencia(){
         this.adjList = new HashMap<>();
     }
 //
@@ -168,7 +168,7 @@ public class ListaAdjacencia implements RepresentacionGrafo{
         System.out.println("Grado del nodo " + nodo + ": " + getGrado(nodo));
     }
 
-    public void imprimirListaAdjacencia(){
+    public void imprimirListaAdyacencia(){
         for(String nodo : getNodos()){
             System.out.println("Nodo: " + nodo);
             imprimirAristasDeUnNodo(nodo);

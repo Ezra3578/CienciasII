@@ -27,6 +27,14 @@ public class Prim implements AlgoritmoMSP{
         this.aristasMST = new ArrayList<>();
     }
 
+        public Prim(ListaAdyacencia grafo){
+        this.grafo = grafo;
+        this.visitados = new HashSet<>();
+        this.pQueue = new PriorityQueue<>();
+        this.pasos = 0;
+        this.aristasMST = new ArrayList<>();
+    }
+
     @Override
     public void encontrarMSP(String nodo_inicial) {
         //Limpia los valores

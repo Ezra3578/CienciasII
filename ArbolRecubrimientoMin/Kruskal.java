@@ -16,8 +16,14 @@ public class Kruskal implements AlgoritmoMSP{
         this.pasos=0;
         this.mst = new ArrayList<>();
         this.pesoTotal = 0;
-
     }
+
+    public Kruskal(ListaAdyacencia grafo){
+        this.grafo = grafo;
+        this.pasos=0;
+        this.mst = new ArrayList<>();
+        this.pesoTotal = 0;
+    }    
 
     @Override
     public void encontrarMSP(String nodo_inicial){

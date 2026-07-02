@@ -1,8 +1,10 @@
-import java.util.PriorityQueue;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Set;
 
 public class Prim implements AlgoritmoMSP{
 
@@ -16,7 +18,7 @@ public class Prim implements AlgoritmoMSP{
     public Prim(ListaAdyacencia grafo){
         this.grafo = grafo;
         this.visitados = new HashSet<>();
-        this.pQueue = new PriorityQueue();
+        this.pQueue = new PriorityQueue<>();
         this.pasos = 0;
         this.aristasMST = new ArrayList<>();
     }

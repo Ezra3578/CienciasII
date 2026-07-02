@@ -45,12 +45,13 @@ public class Main {
         Prim prim = new Prim(la);
 
         System.out.println("El árbol de expansión mínima es: "+prim.getCamino("A"));
-
+        System.out.println("Número de pasos: "+prim.getPasos());
 
         //8. Kruskal pero sin tanto bombo
         System.out.println("============ KRUSKAL ============");
         Kruskal kruskal = new Kruskal(la);
         System.out.println("El árbol de expansión mínima es: "+kruskal.getCamino("A"));
+        System.out.println("Número de pasos: "+kruskal.getPasos());
 
     }
 }

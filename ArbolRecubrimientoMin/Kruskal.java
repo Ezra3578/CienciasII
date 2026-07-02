@@ -61,7 +61,7 @@ public class Kruskal implements AlgoritmoMSP{
             return "No se ha calculado el MST. Ejecute encontrarMSP primero.";
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("Aristas del Árbol de Expansión Mínima:\n");
+        sb.append("\n");
         for (Arista a : mst) {
             sb.append(a.nodo1).append(" - ").append(a.nodo2)
               .append(" : ").append(a.peso).append("\n");

@@ -27,7 +27,7 @@ public class Main {
         la.agregarArista("D", "E", 13);
         la.agregarArista("D", "H", 7);
         la.agregarArista("E", "F", 10);
-        la.agregarArista("F", "G", 9);
+        la.agregarArista("F", "G", 7);
         la.agregarArista("H", "I", 8);
         la.imprimirConexiones();  // muestra cada nodo y sus pesos
 
@@ -70,7 +70,7 @@ public class Main {
         prim.add(new Prim(la, true));
         kruskal.add(new Kruskal(la, true));
 
-        //Grafo con 10 nuevas aristas (iteración final)
+        //Grafo con 10 nuevas aristas (iteración 5)
         System.out.println("\n================ Iteración 5 ================");
         la.agregarArista("D", "F", 2);
         la.agregarArista("I", "J", 3);
@@ -78,7 +78,29 @@ public class Main {
         prim.add(new Prim(la, true));
         kruskal.add(new Kruskal(la, true));
 
-        for(int i=0; i<5;i++){
+        //Grafo con 15 nuevas aristas (iteración 6)
+        System.out.println("\n================ Iteración 6 ================");
+        la.agregarArista("A", "C", 10);
+        la.agregarArista("C", "I", 7);
+        la.agregarArista("D", "G", 4);
+        la.agregarArista("D", "J", 17);
+        la.agregarArista("F", "H", 6);
+        la.imprimirConexiones();  // muestra cada nodo y sus pesos
+        prim.add(new Prim(la, true));
+        kruskal.add(new Kruskal(la, true));
+
+        //Grafo con 20 nuevas aristas (iteración final)
+        System.out.println("\n================ Iteración 7 ================");
+        la.agregarArista("A", "E", 21);
+        la.agregarArista("B", "J", 2);
+        la.agregarArista("C", "H", 7);
+        la.agregarArista("E", "G", 5);
+        la.agregarArista("G", "I", 12);
+        la.imprimirConexiones();  // muestra cada nodo y sus pesos
+        prim.add(new Prim(la, true));
+        kruskal.add(new Kruskal(la, true));
+
+        for(int i=0; i<7;i++){
             System.out.println("\n\n================ Iteración "+(i)+" ================");
 
             //PRIM

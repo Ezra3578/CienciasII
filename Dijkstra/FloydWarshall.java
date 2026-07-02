@@ -3,9 +3,9 @@ import java.util.*;
 public class FloydWarshall implements AlgoritmoDistanciaMasCorta {
 
     private MatrizAdyacencia grafo;
-    private int[][] dist;
+    private long[][] dist;
     private int[][] next;
-    private static final int INF = (int)1e8;
+    private static final long INF = (long) 1e15;
     private int pasos; 
 
     public FloydWarshall(MatrizAdyacencia grafo) {
@@ -17,10 +17,10 @@ public class FloydWarshall implements AlgoritmoDistanciaMasCorta {
         //Inicializar el contador en cero
         this.pasos = 0;
 
-        // Paso 1: construir matriz de adyacencia
-        List<String> nodos = grafo.getMatriz(); // necesitas un getter en MatrizAdyacencia
+        //Construir matriz de adyacencia
+        List<String> nodos = grafo.getMatriz(); 
         int V = nodos.size();
-        dist = new int[V][V];
+        dist = new long[V][V];
         next = new int[V][V];
 
         // inicializar
@@ -28,28 +28,58 @@ public class FloydWarshall implements AlgoritmoDistanciaMasCorta {
             for (int j = 0; j < V; j++) {
                 if (i == j) {
                     dist[i][j] = 0;
-                } else if (grafo.existeArista(nodos.get(i), nodos.get(j))) {
-                    dist[i][j] = grafo.getPeso(nodos.get(i), nodos.get(j)); // necesitas getPeso
-                } else {
-                    dist[i][j] = INF;
+                } 
+                //'i < j' obliga a leer la arista en un solo sentido
+                else if (grafo.existeArista(nodos.get(i), nodos.get(j))) {
+                    dist[i][j] = grafo.getPeso(nodos.get(i), nodos.get(j)); 
+                } 
+                else {
+                    dist[i][j] = INF; // El sentido inverso (j -> i) se volverá infinito
                 }
                 next[i][j] = j;
             }
         }
 
-        // Paso 2: algoritmo Floyd–Warshall
+        //CORE del algoritmo Floyd–Warshall
         for (int k = 0; k < V; k++) {
             for (int i = 0; i < V; i++) {
                 for (int j = 0; j < V; j++) {
 
                     //Se cuentan los pasos del algoritmo principal
                     this.pasos++;
-                    if (dist[i][k] + dist[k][j] < dist[i][j]) {
-                        dist[i][j] = dist[i][k] + dist[k][j];
-                        next[i][j] = next[i][k];
+
+                    //Evitar que INF + valor negativo provoque una búsqueda infinita
+
+                    if(dist[i][k] != INF && dist[k][j] != INF){
+                        if (dist[i][k] + dist[k][j] < dist[i][j]) {
+                            dist[i][j] = dist[i][k] + dist[k][j];
+                            next[i][j] = next[i][k];
+                        }
                     }
                 }
             }
+        }
+
+        //Verificar si hay ciclos negativos que provocan búsquedas infinitas
+
+        verificarCiclosNegativos(nodos);    
+    }
+
+    private void verificarCiclosNegativos(List<String> nodos) {
+        List<String> nodosAfectados = new ArrayList<>();
+        for (int i = 0; i < nodos.size(); i++) {
+            if (dist[i][i] < 0) {
+                nodosAfectados.add(nodos.get(i));
+            }
+        }
+
+        if (!nodosAfectados.isEmpty()) {
+            throw new IllegalStateException(
+                "¡Grafo inválido! Se detectó un ciclo negativo que involucra al/los nodo(s): "
+                + String.join(", ", nodosAfectados)
+                + ". Nota: en un grafo NO dirigido, basta con que UNA sola arista tenga peso "
+                + "negativo para generar un ciclo negativo trivial (ida y vuelta por esa misma arista)."
+            );
         }
     }
 
@@ -78,7 +108,6 @@ public class FloydWarshall implements AlgoritmoDistanciaMasCorta {
 
     @Override
     public String getCamino(String nodo_inicial) {
-        // ejemplo: mostrar caminos desde nodo_inicial a todos
         List<String> nodos = grafo.getMatriz();
         int i = nodos.indexOf(nodo_inicial);
         StringBuilder sb = new StringBuilder();
@@ -116,3 +145,4 @@ public class FloydWarshall implements AlgoritmoDistanciaMasCorta {
     }
 
 }
+

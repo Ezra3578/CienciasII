@@ -73,16 +73,22 @@ public class Main {
         // ================================
         // 5. FLOYD–WARSHALL
         // ================================
-        System.out.println("\n===== FLOYD–WARSHALL =====");
-        FloydWarshall fw = new FloydWarshall(ma);
+        System.out.println("\n===== FLOYD-WARSHALL (grafo dirigido, sin ciclo negativo) =====");
 
+        MatrizAdyacenciaDirigida mad = new MatrizAdyacenciaDirigida();
+        mad.agregarArista("A", "B", 2);
+        mad.agregarArista("B", "C", 4);
+        mad.agregarArista("C", "D", 1);
+        mad.agregarArista("A", "D", -2); // arista negativa que NO cierra ciclo (A no tiene entrantes)
 
+        System.out.println(mad.mostrarMatriz());
+
+        FloydWarshall fw = new FloydWarshall(mad);
         try {
-            fw.calcularDistanciaMasCorta("A");
-            
+
             // Calcula todas las distancias mínimas
             fw.calcularDistanciaMasCorta("A");
-            
+
             // Distancias desde A hacia todos
             System.out.println(fw.getDistancia("A"));
 
@@ -96,13 +102,29 @@ public class Main {
             System.out.println("Camino A -> D = " + fw.getCamino("A", "D"));
 
             //Cantidad de pasos de FloydWharshall
-            System.out.println("La cantidad de pasos de FloydWharshall es: "+fw.getPasos());
-
+            System.out.println("La cantidad de pasos de Floyd-Warshall es: " + fw.getPasos());
+            
         } catch (IllegalStateException e) {
+            System.err.println("[Floyd-Warshall] " + e.getMessage());
+        }
+
+        System.out.println("\n===== FLOYD-WARSHALL (grafo dirigido, CON ciclo negativo real) =====");
+
+        MatrizAdyacenciaDirigida madNeg = new MatrizAdyacenciaDirigida();
+        madNeg.agregarArista("A", "B", 2);
+        madNeg.agregarArista("B", "C", 3);
+        madNeg.agregarArista("C", "D", 4);
+        madNeg.agregarArista("D", "A", -10); // cierra el ciclo A->B->C->D->A = 2+3+4-10 = -1
+
+        FloydWarshall fwNeg = new FloydWarshall(madNeg);
+        try {
+            fwNeg.calcularDistanciaMasCorta("A");
+            System.out.println(fwNeg.getDistancia("A"));
+        } catch (IllegalStateException e) {
+
             // Avisa del error en Floyd-Warshall pero NO detiene el Main
             System.err.println("[Floyd-Warshall] " + e.getMessage());
         }
-        
 
 
         // ===================================

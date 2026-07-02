@@ -23,18 +23,18 @@ public class FloydWarshall implements AlgoritmoDistanciaMasCorta {
         dist = new long[V][V];
         next = new int[V][V];
 
-        // inicializar
+        // Inicializar
         for (int i = 0; i < V; i++) {
             for (int j = 0; j < V; j++) {
                 if (i == j) {
                     dist[i][j] = 0;
                 } 
-                //'i < j' obliga a leer la arista en un solo sentido
+                
                 else if (grafo.existeArista(nodos.get(i), nodos.get(j))) {
                     dist[i][j] = grafo.getPeso(nodos.get(i), nodos.get(j)); 
                 } 
                 else {
-                    dist[i][j] = INF; // El sentido inverso (j -> i) se volverá infinito
+                    dist[i][j] = INF; 
                 }
                 next[i][j] = j;
             }
@@ -74,11 +74,16 @@ public class FloydWarshall implements AlgoritmoDistanciaMasCorta {
         }
 
         if (!nodosAfectados.isEmpty()) {
+            boolean esDirigido = grafo instanceof MatrizAdyacenciaDirigida;
+            String tipo = esDirigido ? "dirigido" : "no dirigido";
+            String nota = esDirigido
+                ? "Existe un camino cerrado real cuya suma de pesos es negativa."
+                : "En un grafo NO dirigido, basta con que UNA sola arista tenga peso "
+                + "negativo para generar un ciclo negativo trivial (ida y vuelta por esa misma arista).";
+
             throw new IllegalStateException(
-                "¡Grafo inválido! Se detectó un ciclo negativo que involucra al/los nodo(s): "
-                + String.join(", ", nodosAfectados)
-                + ". Nota: en un grafo NO dirigido, basta con que UNA sola arista tenga peso "
-                + "negativo para generar un ciclo negativo trivial (ida y vuelta por esa misma arista)."
+                "¡Grafo inválido (" + tipo + ")! Se detectó un ciclo negativo que involucra "
+                + "al/los nodo(s): " + String.join(", ", nodosAfectados) + ". " + nota
             );
         }
     }

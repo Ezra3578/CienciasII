@@ -1,5 +1,3 @@
-//package com.example.matrizincidencia;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -170,9 +168,8 @@ public class MatrizIncidencia {
         );
     }
 
-    // ==========================================
+
     // ELIMINAR VÉRTICE
-    // ==========================================
     public void eliminarVertice(String nombreVertice) {
         int verticeAEliminar = nombresVertices.indexOf(nombreVertice);
 
@@ -286,38 +283,4 @@ public class MatrizIncidencia {
     return indice;
     }
 
-    /*// MAIN DE PRUEBA
-    public static void main(String[] args) {
-
-        String[] ciudades = {"Bogota","Medellin","Cali", "Villavicencio"};
-
-        MatrizIncidencia grafo = new MatrizIncidencia(ciudades);
-
-        grafo.adicionarArista("Ruta1","Bogota","Medellin",50); //Nombre, origen, destino, peso
-
-        grafo.adicionarArista("Ruta2","Medellin","Cali",30); //Nombre, origen, destino, peso 
-
-        grafo.mostrarMatriz();
-
-        grafo.actualizarPeso("Bogota","Medellin",75); //Origen, destino, nuevo peso
-
-        grafo.adicionarVertice("Cartagena");
-
-        grafo.adicionarArista("Ruta3","Cali","Villavicencio",40);
-        
-        grafo.adicionarArista("Ruta4", "Villavicencio", "Cartagena", 22);
-
-        grafo.mostrarMatriz();
-        
-        System.out.println("Eliminando vertice Bogota");
-        
-        grafo.eliminarVertice("Bogota");
-        
-        grafo.eliminarArista(0, 0);
-        
-        
-        
-        grafo.mostrarMatriz();
-        System.out.println(grafo.obtenerIndiceVertice("Cartagena"));
-    }*/
 }

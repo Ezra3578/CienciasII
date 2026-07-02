@@ -100,7 +100,7 @@ public class Main {
         prim.add(new Prim(la, true));
         kruskal.add(new Kruskal(la, true));
 
-        for(int i=0; i<7;i++){
+        for(int i=0; i<8;i++){
             System.out.println("\n\n================ Iteración "+(i)+" ================");
 
             //PRIM

@@ -144,6 +144,23 @@ public class ListaAdyacencia implements RepresentacionGrafo{
         return adjList.get(nodo).keySet();
     }
 
+    public ListaAdyacencia copiar(){
+        ListaAdyacencia copia = new ListaAdyacencia();
+        // Copiar nodos
+        for (String nodo : this.adjList.keySet()) {
+            copia.agregarNodo(nodo);
+        }
+        // Copiar aristas sin duplicar
+        for (String nodo : this.adjList.keySet()) {
+            for (Map.Entry<String, Integer> vecino : this.adjList.get(nodo).entrySet()) {
+                if (nodo.compareTo(vecino.getKey()) < 0) {
+                    copia.agregarArista(nodo, vecino.getKey(), vecino.getValue());
+                }
+            }
+        }
+        return copia;
+    }
+
     //imprimir cosas:
 
     public void imprimirListaNodos(){

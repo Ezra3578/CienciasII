@@ -15,8 +15,12 @@ public class Prim implements AlgoritmoMSP{
 
     private int pasos;
 
-    public Prim(ListaAdyacencia grafo){
-        this.grafo = grafo;
+    public Prim(ListaAdyacencia grafo, boolean copiarGrafo){
+        if(copiarGrafo){
+            this.grafo = grafo.copiar();
+        } else {
+            this.grafo = grafo;
+        }
         this.visitados = new HashSet<>();
         this.pQueue = new PriorityQueue<>();
         this.pasos = 0;

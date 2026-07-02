@@ -7,8 +7,12 @@ public class Kruskal implements AlgoritmoMSP{
     private List<Arista> mst;
     private int pesoTotal;
 
-    public Kruskal(ListaAdyacencia grafo){
-        this.grafo = grafo;
+    public Kruskal(ListaAdyacencia grafo, boolean copiarGrafo){
+        if(copiarGrafo){
+            this.grafo = grafo.copiar();
+        } else {
+            this.grafo = grafo;
+        }
         this.pasos=0;
         this.mst = new ArrayList<>();
         this.pesoTotal = 0;

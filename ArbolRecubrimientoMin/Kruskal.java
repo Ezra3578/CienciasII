@@ -1,9 +1,15 @@
+import java.util.*;
+
 public class Kruskal implements AlgoritmoMSP{
 
     private ListaAdyacencia grafo;
+    private int pasos;
+    private List<Arista> mst;
+    private int pesoTotal;
 
     public Kruskal(ListaAdyacencia grafo){
-
+        this.grafo = grafo;
+        pasos=0;
     }
 
     @Override

@@ -47,15 +47,35 @@ public class Main {
         // 3. LISTA DE ADYACENCIA
         // ================================
         System.out.println("\n===== LISTA DE ADYACENCIA =====");
-        ListaAdjacencia la = new ListaAdjacencia();
+        ListaAdyacencia la = new ListaAdyacencia();
         la.agregarNodo("A");
         la.agregarNodo("B");
         la.agregarNodo("C");
         la.agregarNodo("D");
-        la.agregarArista("A", "B", 2);
-        la.agregarArista("A", "C", 4);
-        la.agregarArista("B", "C", 1);
-        la.agregarArista("B", "F", 3);
+        la.agregarNodo("E");
+        la.agregarNodo("F");
+        la.agregarNodo("G");
+        la.agregarNodo("H");
+        la.agregarArista("A", "B", 4);
+        la.agregarArista("A", "D", 4);
+
+        la.agregarArista("B", "D", 5);
+        la.agregarArista("B", "C", 3);
+        la.agregarArista("B", "E", 6);
+
+        la.agregarArista("C", "E", 4);
+        la.agregarArista("C", "H", 2);
+
+        la.agregarArista("D", "E", 7);
+        la.agregarArista("D", "F", 4);
+
+        la.agregarArista("E", "F", 4);
+        la.agregarArista("E", "G", 3);
+
+        la.agregarArista("F", "G", 7);
+
+        la.agregarArista("G", "H", 5);
+
         la.imprimirConexiones();  // muestra cada nodo y sus pesos
 
         // ================================

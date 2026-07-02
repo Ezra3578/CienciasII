@@ -56,6 +56,7 @@ public class Kruskal implements AlgoritmoMSP{
 
     @Override
     public String getCamino(String nodo_inicial){
+        encontrarMSP(nodo_inicial);
         if (mst.isEmpty()) {
             return "No se ha calculado el MST. Ejecute encontrarMSP primero.";
         }

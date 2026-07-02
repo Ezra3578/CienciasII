@@ -7,9 +7,9 @@ public class Main {
         MatrizAdyacencia ma = new MatrizAdyacencia();
         try {
             ma.agregarArista("A", "B", 2);
-            ma.agregarArista("B", "C", 3);
-            ma.agregarArista("C", "D", 4);
-            ma.agregarArista("D", "A", -10);
+            ma.agregarArista("B", "C", 4);
+            ma.agregarArista("C", "D", 1);
+            ma.agregarArista("D", "A", 3);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -100,7 +100,7 @@ public class Main {
 
         } catch (IllegalStateException e) {
             // Avisa del error en Floyd-Warshall pero NO detiene el Main
-            System.err.println(e.getMessage());
+            System.err.println("[Floyd-Warshall] " + e.getMessage());
         }
         
 

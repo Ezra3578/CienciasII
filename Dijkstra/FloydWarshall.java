@@ -3,9 +3,9 @@ import java.util.*;
 public class FloydWarshall implements AlgoritmoDistanciaMasCorta {
 
     private MatrizAdyacencia grafo;
-    private int[][] dist;
+    private long[][] dist;
     private int[][] next;
-    private static final int INF = (int)1e8;
+    private static final long INF = (long) 1e15;
     private int pasos; 
 
     public FloydWarshall(MatrizAdyacencia grafo) {
@@ -20,7 +20,7 @@ public class FloydWarshall implements AlgoritmoDistanciaMasCorta {
         //Construir matriz de adyacencia
         List<String> nodos = grafo.getMatriz(); 
         int V = nodos.size();
-        dist = new int[V][V];
+        dist = new long[V][V];
         next = new int[V][V];
 
         // inicializar
@@ -62,12 +62,25 @@ public class FloydWarshall implements AlgoritmoDistanciaMasCorta {
 
         //Verificar si hay ciclos negativos que provocan búsquedas infinitas
 
-        for (int i = 0; i < V; i++) {
+        verificarCiclosNegativos(nodos);    
+    }
+
+    private void verificarCiclosNegativos(List<String> nodos) {
+        List<String> nodosAfectados = new ArrayList<>();
+        for (int i = 0; i < nodos.size(); i++) {
             if (dist[i][i] < 0) {
-                throw new IllegalStateException("¡Grafo inválido! Se detectó un ciclo negativo en el nodo: " + nodos.get(i));
+                nodosAfectados.add(nodos.get(i));
             }
         }
 
+        if (!nodosAfectados.isEmpty()) {
+            throw new IllegalStateException(
+                "¡Grafo inválido! Se detectó un ciclo negativo que involucra al/los nodo(s): "
+                + String.join(", ", nodosAfectados)
+                + ". Nota: en un grafo NO dirigido, basta con que UNA sola arista tenga peso "
+                + "negativo para generar un ciclo negativo trivial (ida y vuelta por esa misma arista)."
+            );
+        }
     }
 
     @Override

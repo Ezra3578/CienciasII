@@ -3,6 +3,8 @@ import java.util.ArrayList;
 public class Main {
     public static void main(String[] args) {
         
+
+    //PRUEBA 1:
         //LISTA DE ADYACENCIA
         System.out.println("\n===== LISTA DE ADYACENCIA =====");
         ListaAdyacencia la = new ListaAdyacencia();
@@ -113,5 +115,124 @@ public class Main {
             System.out.println("El árbol de expansión mínima es:"+kruskal.get(i).getCamino("A"));
             System.out.println("Número de pasos: "+kruskal.get(i).getPasos());            
         }
+
+    //PRUEBA 2:
+        ListaAdyacencia li = new ListaAdyacencia();
+        li.agregarNodo("A");
+        li.agregarNodo("B");
+        li.agregarNodo("C");
+        li.agregarNodo("D");
+        li.agregarNodo("E");
+        li.agregarNodo("F");
+        li.agregarNodo("G");
+        li.agregarNodo("H");
+        li.agregarNodo("I");
+        li.agregarNodo("J");
+        li.agregarNodo("K");
+        li.agregarNodo("L");
+        li.agregarNodo("M");
+        li.agregarNodo("N");
+        li.agregarNodo("O");
+        li.agregarNodo("P");
+        li.agregarNodo("Q");
+        li.agregarNodo("R");
+        li.agregarNodo("S");
+        li.agregarNodo("T");
+        
+        li.agregarArista("A", "K", 2);
+        li.agregarArista("A", "L", 4);
+        li.agregarArista("B", "C", 5);
+        li.agregarArista("C", "D", 2);
+        li.agregarArista("C", "M", 7);
+        li.agregarArista("D", "N", 3);
+        li.agregarArista("E", "F", 11);
+        li.agregarArista("E", "N", 6);
+        li.agregarArista("E", "P", 9);
+        li.agregarArista("G", "H", 6);
+        li.agregarArista("G", "P", 12);
+        li.agregarArista("G", "Q", 4);
+        li.agregarArista("H", "R", 5);
+        li.agregarArista("I", "J", 9);
+        li.agregarArista("I", "S", 3);
+        li.agregarArista("I", "T", 5);
+        li.agregarArista("J", "T", 10);
+        li.agregarArista("L", "M", 8);
+        li.agregarArista("N", "O", 9);
+        li.agregarArista("R", "S", 8);
+
+        ArrayList<Prim> pr = new ArrayList<>();
+        ArrayList<Kruskal> kr = new ArrayList<>();
+
+        pr.add(new Prim(li, true));
+        kr.add(new Kruskal(li, true));        
+
+        li.agregarArista("B", "D", 7);
+        li.agregarArista("B", "M", 6);
+        li.agregarArista("E", "O", 4);
+        li.agregarArista("F", "H", 10);
+        li.agregarArista("K", "N", 6);
+
+        pr.add(new Prim(li, true));
+        kr.add(new Kruskal(li, true)); 
+        
+        li.agregarArista("B", "N", 10);
+        li.agregarArista("F", "P", 2);
+        li.agregarArista("H", "Q", 12);
+        li.agregarArista("O", "R", 11);
+        li.agregarArista("P", "Q", 8);
+
+        pr.add(new Prim(li, true));
+        kr.add(new Kruskal(li, true)); 
+
+        li.agregarArista("A", "O", 14);
+        li.agregarArista("D", "P", 13);
+        li.agregarArista("E", "J", 16);
+        li.agregarArista("G", "I", 8);
+        li.agregarArista("S", "T", 7);
+
+        pr.add(new Prim(li, true));
+        kr.add(new Kruskal(li, true)); 
+
+        li.agregarArista("A", "E", 12);
+        li.agregarArista("F", "S", 15);
+        li.agregarArista("J", "S", 9);
+        li.agregarArista("P", "R", 11);
+        li.agregarArista("K", "L", 5);
+
+        pr.add(new Prim(li, true));
+        kr.add(new Kruskal(li, true)); 
+
+        li.agregarArista("B", "J", 7);
+        li.agregarArista("C", "E", 4);
+        li.agregarArista("C", "I", 15);
+        li.agregarArista("I", "M", 13);
+        li.agregarArista("R", "T", 9);   
+        
+        pr.add(new Prim(li, true));
+        kr.add(new Kruskal(li, true)); 
+
+        li.agregarArista("D", "M", 4);
+        li.agregarArista("F", "N", 7);
+        li.agregarArista("H", "I", 8);
+        li.agregarArista("J", "R", 8);
+        li.agregarArista("K", "M", 7);  
+        
+        pr.add(new Prim(li, true));
+        kr.add(new Kruskal(li, true));         
+
+        
+        for(int i=0; i<7;i++){
+            System.out.println("\n\n================ Iteración "+(i)+" ================");
+
+            //PRIM
+            System.out.println("============ PRIM ============");
+            System.out.println("El árbol de expansión mínima es:\n"+pr.get(i).getCamino("A"));
+            System.out.println("Número de pasos: "+pr.get(i).getPasos());
+
+            //Kruskal
+            System.out.println("============ KRUSKAL ============");
+            System.out.println("El árbol de expansión mínima es:"+kr.get(i).getCamino("A"));
+            System.out.println("Número de pasos: "+kr.get(i).getPasos());            
+        }        
     }
 }

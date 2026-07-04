@@ -5,19 +5,6 @@ import java.util.*;
 public class GrahamScan implements AlgoritmoConvexHull{
 
     private int pasos=0;
-    static class Punto{
-        double x, y;
-
-        // Constructor de punto
-        Punto(double x, double y) {
-            this.x = x;
-            this.y = y;
-        }
-        @Override
-        public String toString() {
-            return String.format("(%.2f, %.2f)", x, y);
-        }
-    }
     
     private double orientacion (Punto punto1, Punto punto2, Punto punto3) {
         double productox=(punto1.x*(punto2.y-punto3.y)+punto2.x*(punto3.y-punto1.y)+punto3.x*(punto1.y-punto2.y));
@@ -96,7 +83,7 @@ public class GrahamScan implements AlgoritmoConvexHull{
         }
               
     }
-    @Override
+
     public String getTexto(Stack<Punto> pila){
         int tamano=pila.size();
         StringBuilder texto = new StringBuilder();

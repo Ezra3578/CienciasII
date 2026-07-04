@@ -1,7 +1,5 @@
 package ConvexHull;
 
-import ConvexHull.MonotoneChain.Point;
-
 
 public class Main {
     public static void main(String[] args) {
@@ -27,20 +25,9 @@ public class Main {
             // 2. MONOTONE CHAIN
         // ================================
 
-        Point[] points = {
-            new Point(0, 3),
-            new Point(1, 1),
-            new Point(2, 2),
-            new Point(4, 4),
-            new Point(0, 0),
-            new Point(1, 2),
-            new Point(3, 1),
-            new Point(3, 3),
-        };
-
-        System.out.println("\nCaso 2 (aleatorio):");
-        Point[] hull2 = MonotoneChain.convexHull(points);
-        System.out.println(MonotoneChain.printHullInfo(hull2));
+        System.out.println("\n=== Casco Convexo (Monotone Chain) ===");
+        MonotoneChain monChain = new MonotoneChain();
+        System.out.println(monChain.encontrarConvexo(puntos));
     }
 
     

@@ -6,7 +6,7 @@ import java.util.List;
 
 public class DivideAndConquer implements AlgoritmoConvexHull{
 
-    private static int pasos = 0;
+    private int pasos = 0;
 
     // > 0: c está a la izquierda de a->b (giro antihorario)
     // < 0: c está a la derecha de a->b (giro horario)

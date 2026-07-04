@@ -51,6 +51,7 @@ public class GrahamScan implements AlgoritmoConvexHull{
     }
     @Override
     public String encontrarConvexo(double[][] puntos) {
+        pasos = 0;
         ArrayList<Punto> listaPuntos = new ArrayList<>();
         for (double[] p : puntos) {
             listaPuntos.add(new Punto(p[0], p[1]));

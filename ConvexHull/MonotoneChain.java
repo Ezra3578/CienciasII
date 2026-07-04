@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class MonotoneChain implements AlgoritmoConvexHull{
 
-    private static int pasos = 0;
+    private int pasos = 0;
 
     @Override
     public int getPasos() {

@@ -1,5 +1,7 @@
 package ConvexHull;
 
+import ConvexHull.MonotoneChain.Point;
+
 
 public class Main {
     public static void main(String[] args) {
@@ -16,10 +18,30 @@ public class Main {
         System.out.println("=== Casco Convexo (Graham Scan) ===");
 
         try {
-                System.out.println(grafo1.encontrarConvexo(puntos));
-            } catch (IllegalArgumentException | IllegalStateException e) {
-                System.out.println("Error: " + e.getMessage());
-            }
+            System.out.println(grafo1.encontrarConvexo(puntos));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
 
+        // ================================
+            // 2. MONOTONE CHAIN
+        // ================================
+
+        Point[] points = {
+            new Point(0, 3),
+            new Point(1, 1),
+            new Point(2, 2),
+            new Point(4, 4),
+            new Point(0, 0),
+            new Point(1, 2),
+            new Point(3, 1),
+            new Point(3, 3),
+        };
+
+        System.out.println("\nCaso 2 (aleatorio):");
+        Point[] hull2 = MonotoneChain.convexHull(points);
+        System.out.println(MonotoneChain.printHullInfo(hull2));
     }
+
+    
 }

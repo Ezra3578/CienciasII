@@ -1,50 +1,8 @@
 package FlujoMaximo;
 
-import caminoMasCortoAlgoritmos.BellmanFord.BellmanFord;
-import libreriaGrafos.Grafos.MatrizAdyacencia;
-import libreriaGrafos.Grafos.MatrizAdyacenciaDirigida;
-
 public class Main {
 
     public static void main(String[] args) throws Exception {
-
-
-        MatrizAdyacencia m = new MatrizAdyacencia();
-
-        m.agregarArista("A", "B", 2);
-        m.agregarArista("A", "C", 4);
-        m.agregarArista("B", "C", 1);
-        m.agregarArista("B", "D", 3);
-        m.agregarArista("D", "E", 9);
-        m.agregarArista("C", "E", 5);
-
-
-        System.out.println(m.mostrarMatriz());
-
-        // ===================================
-        // 6. BELLMAN-FORD
-        // ===================================
-        System.out.println("============ BELLMAN-FORD ============");
-
-        BellmanFord algoritmoBellmanFord = new BellmanFord(m);
-
-        //ejecutar el algoritmo desde el nodo inicial "A"
-        algoritmoBellmanFord.calcularDistanciaMasCorta("A");
-
-        //obtener la distancias más corta desde A hasta todos los nodos
-        System.out.println(algoritmoBellmanFord.getDistancia("A"));
-
-        // obtener la distancia más corta entre A y D
-        System.out.println(algoritmoBellmanFord.getDistancia("A", "D"));
-
-        //obtener el camino más corto desde el nodo inicial "A" hasta el nodo destino "E"
-        System.out.println(algoritmoBellmanFord.getCamino("A", "D"));
-
-        //obtener todos los caminos más cortos desde el nodo inicial "A" hasta cualquier otro nodo
-        System.out.println(algoritmoBellmanFord.getCamino("A"));
-
-        //obtener cantidad de pasos
-        System.out.println("Pasos para el algoritmo Bellman-Ford es : " + algoritmoBellmanFord.getPasos());
 
         // ============================
         // FORD-FULKERNSON
@@ -67,12 +25,24 @@ public class Main {
 
         m2.agregarArista("V4", "T", 6);
 
+        
+        System.out.println("El grafo sobre iterar es el siguiente: \n"+m2.mostrarMatriz());
+
 
         FordFulkerson fordFulkerson = new FordFulkerson();
         int flujoMaximo = fordFulkerson.calcularFlujoMaximo(m2, "S", "T");
+        System.out.println("El camino correspondiente al Ford-Fulkerson desde el nodo S hasta el nodo T es: \n");
         System.out.println(fordFulkerson.getCaminos());
         System.out.println("El flujo máximo desde S hasta T es: " + flujoMaximo);
 
+        // ============================
+        // EDMONDS-KARP
+        // ============================
+        EdmondsKarp edmondsKarp = new EdmondsKarp();
+        int flujoMax = edmondsKarp.calcularFlujoMaximo(m2, "S", "T");
+        System.out.println("El camino correspondiente al Edmonds-Karp desde el nodo S hasta el nodo T es: \n");
+        System.out.println(edmondsKarp.getCaminos());
+        System.out.println("El flujo máximo desde S hasta T es: " + flujoMax);
 
     }
 }

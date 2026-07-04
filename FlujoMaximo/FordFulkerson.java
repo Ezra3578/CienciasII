@@ -1,10 +1,8 @@
 package FlujoMaximo;
 
-import libreriaGrafos.Grafos.MatrizAdyacencia;
-
 import java.util.List;
 
-public class FordFulkerson {
+public class FordFulkerson implements AlgoritmosFlujoMax{
 
     private StringBuilder caminos = new StringBuilder();
 
@@ -12,6 +10,7 @@ public class FordFulkerson {
         return caminos;
     }
 
+    @Override
     public int calcularFlujoMaximo(MatrizAdyacencia grafoOriginal, String nodoInicial, String nodoFinal) {
 
         //Para no dañar los datos originales

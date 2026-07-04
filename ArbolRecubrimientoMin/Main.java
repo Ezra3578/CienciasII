@@ -219,7 +219,7 @@ public class Main {
         
         pr.add(new Prim(li, true));
         kr.add(new Kruskal(li, true));         
-
+        
         
         for(int i=0; i<7;i++){
             System.out.println("\n\n================ Iteración "+(i)+" ================");

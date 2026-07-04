@@ -1,6 +1,5 @@
 package ConvexHull;
 
-
 public class Main {
     public static void main(String[] args) {
         double[][] puntos = {
@@ -22,13 +21,20 @@ public class Main {
         }
 
         // ================================
-            // 2. MONOTONE CHAIN
+        // 2. MONOTONE CHAIN
         // ================================
 
         System.out.println("\n=== Casco Convexo (Monotone Chain) ===");
         MonotoneChain monChain = new MonotoneChain();
         System.out.println(monChain.encontrarConvexo(puntos));
-    }
 
-    
+        // ================================
+        // 3. DIVIDE AND CONQUER
+        // ================================
+
+        System.out.println("\n=== Casco Convexo (Divide y Vencerás) ===");
+        DivideAndConquer divAndCon = new DivideAndConquer();
+        System.out.println(divAndCon.encontrarConvexo(puntos));
+
+    }
 }

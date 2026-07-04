@@ -5,13 +5,22 @@ import java.util.List;
 public class EdmondsKarp implements AlgoritmosFlujoMax{
 
     private StringBuilder caminos = new StringBuilder();
+    private int pasos = 0;
 
     public StringBuilder getCaminos() {
         return caminos;
     }
 
     @Override
+    public int getPasos() {
+        return pasos;
+    }
+
+    @Override
     public int calcularFlujoMaximo(MatrizAdyacencia grafoOriginal, String nodoInicial, String nodoFinal) {
+
+        pasos = 0;
+        caminos.setLength(0);
 
         //Para no dañar los datos originales
         MatrizAdyacencia grafoResidual = clonarGrafo(grafoOriginal);
@@ -24,7 +33,9 @@ public class EdmondsKarp implements AlgoritmosFlujoMax{
         while (true) {
             // se crea el camino desde la nodoInicial hasta el nodoFinal usando BFS
             // (al ser BFS, siempre es el camino más corto en número de aristas)
-            List<String> camino = buscador.caminoBFS(grafoResidual, nodoInicial, nodoFinal);
+            int[] pasosBusqueda = new int[1];
+            List<String> camino = buscador.caminoBFS(grafoResidual, nodoInicial, nodoFinal, pasosBusqueda);
+            pasos += pasosBusqueda[0];
 
             // Si devuelve null significa que ya no hay más formas de llegar
             if (camino == null) {
@@ -68,7 +79,6 @@ public class EdmondsKarp implements AlgoritmosFlujoMax{
             caminos.append(nodoActual).append(" -> ").append(nodoSiguiente).append(" (Capacidad: ").append(grafoResidual.getNodos().get(nodoActual).get(nodoSiguiente)).append(")\n");
         }
     }
-
 
     private int encontrarCuelloBotella(MatrizAdyacencia grafoResidual, List<String> camino) {
         //inicializar el cuello de botella como el valor máximo de un entero

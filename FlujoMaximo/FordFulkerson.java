@@ -5,13 +5,22 @@ import java.util.List;
 public class FordFulkerson implements AlgoritmosFlujoMax{
 
     private StringBuilder caminos = new StringBuilder();
+    private int pasos = 0;
 
     public StringBuilder getCaminos() {
         return caminos;
     }
 
     @Override
+    public int getPasos() {
+        return pasos;
+    }
+
+    @Override
     public int calcularFlujoMaximo(MatrizAdyacencia grafoOriginal, String nodoInicial, String nodoFinal) {
+
+        pasos = 0;
+        caminos.setLength(0);
 
         //Para no dañar los datos originales
         MatrizAdyacencia grafoResidual = clonarGrafo(grafoOriginal);
@@ -23,7 +32,9 @@ public class FordFulkerson implements AlgoritmosFlujoMax{
         //  bucle principal de Ford-Fulkerson
         while (true) {
             // se crea el camino desde la nodoInicial hasta el nodoFinal usando DFS
-            List<String> camino = buscador.caminoDFS(grafoResidual, nodoInicial, nodoFinal);
+            int[] pasosBusqueda = new int[1];
+            List<String> camino = buscador.caminoDFS(grafoResidual, nodoInicial, nodoFinal, pasosBusqueda);
+            pasos += pasosBusqueda[0];
 
             // Si devuelve null significa que ya no hay más formas de llegar
             if (camino == null) {

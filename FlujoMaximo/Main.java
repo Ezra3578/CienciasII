@@ -34,6 +34,7 @@ public class Main {
         System.out.println("El camino correspondiente al Ford-Fulkerson desde el nodo S hasta el nodo T es: \n");
         System.out.println(fordFulkerson.getCaminos());
         System.out.println("El flujo máximo desde S hasta T es: " + flujoMaximo);
+        System.out.println("Pasos totales (Ford-Fulkerson): " + fordFulkerson.getPasos() + "\n");
 
         // ============================
         // EDMONDS-KARP
@@ -43,6 +44,7 @@ public class Main {
         System.out.println("El camino correspondiente al Edmonds-Karp desde el nodo S hasta el nodo T es: \n");
         System.out.println(edmondsKarp.getCaminos());
         System.out.println("El flujo máximo desde S hasta T es: " + flujoMax);
+        System.out.println("Pasos totales (Edmonds-Karp): " + edmondsKarp.getPasos() + "\n");
 
     }
 }

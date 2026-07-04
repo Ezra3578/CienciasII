@@ -25,6 +25,17 @@ public class RecorridoDFS {
          return null;
     }
 
+    public List<String> caminoDFS(MatrizAdyacencia grafo, String nodoInicial, String nodo_objetivo, int[] pasos) {
+         Set<String> visitados = new HashSet<>();
+         List<String> camino = new ArrayList<>();
+
+         if(dfsRecursivo(grafo, nodoInicial, nodo_objetivo, visitados, camino, pasos)) {
+             return camino;
+         }
+
+         return null;
+    }
+
     // este metodo es recursivo por la naturaleza el DFS
     private boolean dfsRecursivo(MatrizAdyacencia grafo, String nodoActual, String nodoObjetivo, Set<String> visitados, List<String> camino) {
 
@@ -51,6 +62,42 @@ public class RecorridoDFS {
 
             //si el vecino no ha sido visitado, y la capacidad disponible es mayor que 0, llama recursivamente tomando este vecino como nodo actual
             if(!visitados.contains(vecino) && capacidadDisponible > 0 && dfsRecursivo(grafo, vecino, nodoObjetivo, visitados, camino)) {
+                    return true;
+            }
+        }
+
+        //backtracking en caso de que no se haya encontrado el nodo objetivo en este camino/sub-arbol
+        //camino.removeLast();
+        camino.remove(camino.size()-1);
+        return false;
+    }
+
+    private boolean dfsRecursivo(MatrizAdyacencia grafo, String nodoActual, String nodoObjetivo, Set<String> visitados, List<String> camino, int[] pasos) {
+
+        camino.add(nodoActual);
+        visitados.add(nodoActual);
+
+        if(nodoActual.equals(nodoObjetivo)) return true;
+
+        // mapa de vecinos del nodo actual con var para evitar errores si llega a ser null
+        var vecinosMap = grafo.getNodos().get(nodoActual);
+
+        // Si el nodo no existe o no tiene vecinos/hijos hace backtracking
+        if (vecinosMap == null || vecinosMap.isEmpty()) {
+            //camino.removeLast(); //comentada pq el codespace usa es java versión 11, y ese método existe es desde la fokin versión 21
+            camino.remove(camino.size()-1);
+            return false;
+        }
+
+        //for que recorre los vecinos del nodo actual|
+        for(String vecino : grafo.getNodos().get(nodoActual).keySet()) {
+            pasos[0]++;
+
+            //guarda la capacida entre el nodo actual y el vecino
+            int capacidadDisponible = grafo.getNodos().get(nodoActual).get(vecino);
+
+            //si el vecino no ha sido visitado, y la capacidad disponible es mayor que 0, llama recursivamente tomando este vecino como nodo actual
+            if(!visitados.contains(vecino) && capacidadDisponible > 0 && dfsRecursivo(grafo, vecino, nodoObjetivo, visitados, camino, pasos)) {
                     return true;
             }
         }

@@ -38,7 +38,8 @@ public class RecorridoDFS {
 
         // Si el nodo no existe o no tiene vecinos/hijos hace backtracking
         if (vecinosMap == null || vecinosMap.isEmpty()) {
-            camino.removeLast();
+            //camino.removeLast(); //comentada pq el codespace usa es java versión 11, y ese método existe es desde la fokin versión 21
+            camino.remove(camino.size()-1);
             return false;
         }
 
@@ -55,7 +56,8 @@ public class RecorridoDFS {
         }
 
         //backtracking en caso de que no se haya encontrado el nodo objetivo en este camino/sub-arbol
-        camino.removeLast();
+        //camino.removeLast();
+        camino.remove(camino.size()-1);
         return false;
     }
 

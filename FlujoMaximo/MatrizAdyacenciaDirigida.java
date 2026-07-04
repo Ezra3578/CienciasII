@@ -10,6 +10,10 @@ import java.util.ArrayList;
  */
 public class MatrizAdyacenciaDirigida extends MatrizAdyacencia {
 
+    public MatrizAdyacenciaDirigida() {
+        super();
+    }
+
     @Override
     public void agregarArista(String origen, String destino, int peso) {
         // Si alguno no existe, se crea

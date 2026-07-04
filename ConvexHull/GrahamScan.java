@@ -54,8 +54,8 @@ public class GrahamScan implements AlgoritmoConvexHull{
         for (int j=0 ; j<tamano ; j++) {
             while (j<tamano-1 && orientacion(puntoRefFinal,listaPuntos.get(j), listaPuntos.get(j+1))==0){
                 j++;
-                pasos++;
             }
+            
             listaPuntos.set(m, listaPuntos.get(j));
             m++;
         }
@@ -70,7 +70,6 @@ public class GrahamScan implements AlgoritmoConvexHull{
         }
         Punto puntoRef = listaPuntos.get(0);
         for (Punto p : listaPuntos) {
-            pasos++;
             if (p.y < puntoRef.y || (p.y == puntoRef.y && p.x < puntoRef.x)) {
                 puntoRef = p;
             }

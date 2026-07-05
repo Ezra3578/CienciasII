@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zonificación y Rutas de Reparto</title>
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <aside id="panel">
+      <h1>Reparto por Zonas</h1>
+
+      <section>
+        <label>Ciudad / lugar</label>
+        <input id="place-input" type="text" placeholder="Ej: Chía, Cundinamarca, Colombia" />
+        <button id="build-graph-btn">1. Construir grafo</button>
+      </section>
+
+      <section>
+        <p class="hint">
+          Clic en el mapa: primer clic = depot, siguientes clics = puntos de entrega.
+        </p>
+        <button id="clear-points-btn">Limpiar puntos</button>
+      </section>
+
+      <section>
+        <label>Radio de conflicto (metros)</label>
+        <input id="conflict-radius" type="number" value="300" />
+        <button id="build-zones-btn">2. Colorear / crear zonas</button>
+      </section>
+
+      <section>
+        <button id="plan-routes-btn">3. Planificar rutas por zona</button>
+      </section>
+
+      <section id="results">
+        <h2>Resultados</h2>
+        <div id="results-content">Aún no hay resultados.</div>
+      </section>
+    </aside>
+
+    <main id="map"></main>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

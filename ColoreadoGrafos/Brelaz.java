@@ -1,29 +1,25 @@
 package ColoreadoGrafos;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Brelaz implements AlgoritmoColoreadoGrafos {
 
     ListaAdyacencia grafo;
-    int pasos;
+    private int pasos;                    
+    private Map<String, Integer> colores; // Almacena la coloración tras ejecutar el algoritmo
+    private int maxColor;                 // Número máximo de colores usados
 
     public Brelaz(ListaAdyacencia grafo) {
         this.grafo = grafo;
         this.pasos = 0;
     }
 
-        /**
-     * Ejecuta el algoritmo de coloración Brelaz y muestra por consola
-     * el color asignado a cada nodo. Los colores se representan como números
-     * enteros positivos (1, 2, 3, ...).
+    /**
+     * Ejecuta el algoritmo Brelaz (DSATUR) y guarda el resultado.
+     * Muestra la coloración y el número cromático aproximado por consola.
      */
-
-    @Override    
     public void colorear() {
-        Map<String, Integer> colores = new HashMap<>();
+        colores = new HashMap<>();
         Map<String, Set<Integer>> coloresVecinos = new HashMap<>();
         Map<String, Integer> grados = new HashMap<>();
 
@@ -38,15 +34,13 @@ public class Brelaz implements AlgoritmoColoreadoGrafos {
         int coloreados = 0;
 
         while (coloreados < totalNodos) {
-            // Seleccionar el nodo no coloreado con mayor grado de saturación.
-            // En caso de empate, se elige el de mayor grado original.
-            // Si persiste el empate, se toma el de menor orden lexicográfico.
+            // Seleccionar nodo con mayor grado de saturación (criterio Brelaz)
             String elegido = null;
             int maxSaturacion = -1;
             int maxGrado = -1;
 
             for (String nodo : grafo.getNodos()) {
-                if (colores.get(nodo) == 0) {  // aún no coloreado
+                if (colores.get(nodo) == 0) {
                     int saturacion = coloresVecinos.get(nodo).size();
                     int grado = grados.get(nodo);
 
@@ -61,7 +55,7 @@ public class Brelaz implements AlgoritmoColoreadoGrafos {
                 }
             }
 
-            // Asignar el menor color que no esté siendo usado por sus vecinos
+            // Menor color no utilizado por vecinos
             Set<Integer> coloresProhibidos = new HashSet<>();
             for (String vecino : grafo.getConexiones(elegido).keySet()) {
                 int colorVecino = colores.get(vecino);
@@ -76,9 +70,9 @@ public class Brelaz implements AlgoritmoColoreadoGrafos {
             }
             colores.put(elegido, colorAsignado);
             coloreados++;
-            pasos++;
+            pasos++;  // Incrementar contador de pasos
 
-            // Actualizar la saturación de los vecinos no coloreados
+            // Actualizar saturación de vecinos no coloreados
             for (String vecino : grafo.getConexiones(elegido).keySet()) {
                 if (colores.get(vecino) == 0) {
                     coloresVecinos.get(vecino).add(colorAsignado);
@@ -86,15 +80,34 @@ public class Brelaz implements AlgoritmoColoreadoGrafos {
             }
         }
 
-        // Mostrar resultados por consola
-        System.out.println("Coloración obtenida con el algoritmo Brelaz (DSATUR):");
-        for (String nodo : grafo.getNodos()) {
-            System.out.println("Nodo " + nodo + " -> Color " + colores.get(nodo));
-        }
+        // Calcular número máximo de colores usados
+        maxColor = colores.values().stream().max(Integer::compare).orElse(0);
+    }
 
-        // Número de colores utilizados (cota superior del número cromático)
-        int maxColor = colores.values().stream().max(Integer::compare).orElse(0);
-        System.out.println("Número cromático aproximado: " + maxColor);
+    /**
+     * @return String con la coloración obtenida (nodo -> color).
+     */
+    public String getColoracion() {
+        if (colores == null) {
+            return "Aún no se ha ejecutado el algoritmo de coloración.";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("Coloración obtenida con el algoritmo Brelaz:\n");
+        for (String nodo : grafo.getNodos()) {
+            sb.append("Nodo ").append(nodo).append(" -> Color ").append(colores.get(nodo)).append("\n");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * @return String con el número de colores utilizados (cota superior del número cromático).
+     */
+
+    public String getNumeroCromatico() {
+        if (colores == null) {
+            return "Aún no se ha ejecutado el algoritmo de coloración.";
+        }
+        return "Número cromático aproximado: " + maxColor;
     }
 
     @Override

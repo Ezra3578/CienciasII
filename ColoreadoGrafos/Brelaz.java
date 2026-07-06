@@ -76,6 +76,7 @@ public class Brelaz implements AlgoritmoColoreadoGrafos {
             }
             colores.put(elegido, colorAsignado);
             coloreados++;
+            pasos++;
 
             // Actualizar la saturación de los vecinos no coloreados
             for (String vecino : grafo.getConexiones(elegido).keySet()) {
@@ -98,6 +99,7 @@ public class Brelaz implements AlgoritmoColoreadoGrafos {
 
     @Override
     public int getPasos() {
+        return pasos;
     }
     
 }

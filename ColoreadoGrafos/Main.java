@@ -3,6 +3,8 @@ package ColoreadoGrafos;
 public class Main {
     public static void main(String[] args) {
 
+        //javac ColoreadoGrafos/*.java && java ColoreadoGrafos.Main
+
         //acá copié y pegué un grafo de arboles.
         System.out.println("=== Lista de Adyacencia ===");
         ListaAdyacencia la = new ListaAdyacencia();

@@ -4,7 +4,23 @@ import java.io.IOException;
 import java.util.*;
 
 public class Main {
-    
+    /*PRUEBA
+2
+6 5
+#####
+#A#A##
+# # A#
+#S  ##
+#####
+7 7
+#####
+#AAA###
+#    A#
+# S ###
+#     #
+#AAA###
+#####
+*/
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String linea = br.readLine();
@@ -102,8 +118,7 @@ public class Main {
             Kruskal kruskalAlg = new Kruskal(grafo);
             
             kruskalAlg.encontrarMSP("0");
-            
-            // Imprimimos el costo total del árbol de expansión mínima usando tu método getter
+            // Imprimimos el costo total
             System.out.println(kruskalAlg.getPesoTotal());
         }
     }

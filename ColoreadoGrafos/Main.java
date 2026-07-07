@@ -57,6 +57,11 @@ public class Main {
         System.out.println(resultadoColoracion);
         System.out.println(resultadoCromatico);
         System.out.println("Pasos realizados: " + welschPowell.getPasos());
+        //****** SECUENCIA BASICO(VORAZ) *****
+        System.out.println("\n=== Algoritmo de Secuencia Basico===");
+        VorazColoreado voraz = new VorazColoreado(la);
+        voraz.colorear();
+        System.out.println(voraz.imprimir());
     
     }
 }

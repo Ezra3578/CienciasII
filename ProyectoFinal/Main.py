@@ -18,7 +18,7 @@ from Dijkstra import Dijkstra
 
 def main():
     # 1) Crear el grafo con la red vial de Madrid, Cundinamarca
-    grafo = Grafo(lugar="Madrid, Cundinamarca, Colombia", network_type="drive")
+    grafo = Grafo(lugar="El Rosal, Cundinamarca, Colombia", network_type="drive")
 
     # 2) ---------------------------------------------------------------
     #    PUNTOS DE DESPACHO
@@ -27,13 +27,14 @@ def main():
     #    nombre inventado); si el nombre es una dirección real, puedes omitir
     #    lat/lon y se geocodifica automáticamente.
     # --------------------------------------------------------------------
-    grafo.agregarNodo("Bodega_Central", lat=4.7331, lon=-74.2666)     # centro de Madrid, Cund.
-    grafo.agregarNodo("Centro_Despacho_2", lat=4.7280, lon=-74.2590)
+    grafo.agregarNodo("Bodega_Central", lat=4.851453527058958, lon=-74.27001762359312)     # centro de Madrid, Cund.
+    grafo.agregarNodo("Centro_Despacho_2", lat=4.849896412944008, lon=-74.26834611458263)
 
     # PUNTOS DE ENTREGA
-    grafo.agregarNodo("Cliente_1", lat=4.7395, lon=-74.2620)
-    grafo.agregarNodo("Cliente_2", lat=4.7250, lon=-74.2720)
-    grafo.agregarNodo("Cliente_3", lat=4.7360, lon=-74.2540)
+
+    grafo.agregarNodo("Cliente_1", lat=4.856017820849208, lon=-74.26328633330014)
+    grafo.agregarNodo("Cliente_2", lat=4.851656132479957, lon=-74.26137714947366)
+    grafo.agregarNodo("Cliente_3", lat=4.850154356527056, lon=-74.26061807203888)
 
     # 3) ---------------------------------------------------------------
     #    ARISTAS

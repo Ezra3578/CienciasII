@@ -75,7 +75,7 @@ function haversineDistance(lat1, lon1, lat2, lon2) {
 
 // --- Validación de depot (350 m de separación) ---
 function isDepotTooClose(lat, lng) {
-  return depots.some(d => haversineDistance(lat, lng, d.lat, d.lng) < 350);
+  return depots.some(d => haversineDistance(lat, lng, d.lat, d.lng) < 200);
 }
 
 // --- Redibujar puntos y círculos de depots ---
@@ -150,7 +150,7 @@ map.on("click", (e) => {
 
   if (isCtrl) {
     if (isDepotTooClose(lat, lng)) {
-      alert("No se puede agregar depot: hay otro a menos de 350 m.");
+      alert("No se puede agregar depot: hay otro a menos de 200 m.");
       return;
     }
     const name = getNextDepotLetter();

@@ -1,0 +1,77 @@
+* {
+  box-sizing: border-box;
+}
+
+body, html {
+  margin: 0;
+  height: 100%;
+  font-family: system-ui, sans-serif;
+}
+
+#app {
+  display: flex;
+  height: 100vh;
+}
+
+#panel {
+  width: 320px;
+  padding: 16px;
+  overflow-y: auto;
+  background: #f7f7f9;
+  border-right: 1px solid #ddd;
+}
+
+#panel h1 {
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+}
+
+#panel section {
+  margin-bottom: 18px;
+}
+
+.instructions {
+  background: #eef2ff;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.instructions ul {
+  padding-left: 18px;
+  margin: 6px 0 0;
+}
+
+#panel button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+#panel button:hover {
+  background: #1d4ed8;
+}
+
+#map {
+  flex: 1;
+}
+
+#results-content {
+  font-size: 0.85rem;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px;
+}
+
+/* Estilos para los íconos de los marcadores (opcional, ya están en línea) */
+.depot-icon, .delivery-icon {
+  background: transparent;
+  border: none;
+}

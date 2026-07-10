@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zonificación y Rutas de Reparto - Kamppi</title>
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <aside id="panel">
+      <h1>Reparto por Zonas</h1>
+
+      <section class="instructions">
+        <p><strong>Instrucciones:</strong></p>
+        <ul>
+          <li><strong>Click izquierdo:</strong> agregar punto de entrega.</li>
+          <li><strong>Ctrl + Click izquierdo:</strong> agregar depot.</li>
+          <li><strong>Click derecho</strong> sobre un nodo: eliminarlo.</li>
+        </ul>
+      </section>
+
+      <section>
+        <button id="process-btn">Procesar y obtener rutas</button>
+      </section>
+
+      <section id="results">
+        <h2>Resultados</h2>
+        <div id="results-content">Aún no hay resultados.</div>
+      </section>
+    </aside>
+
+    <main id="map"></main>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

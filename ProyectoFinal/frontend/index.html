@@ -38,6 +38,12 @@
     <main id="map"></main>
   </div>
 
+  <script>
+    if (window.location.hostname.includes("-5500.")) {
+      const target = window.location.href.replace("-5500.", "-8000.");
+      window.location.replace(target);
+    }
+  </script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="app.js"></script>
 </body>

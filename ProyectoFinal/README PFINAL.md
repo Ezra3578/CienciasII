@@ -38,8 +38,23 @@ recibe lo que manda el front, lo imprime por consola, y responde
 algoritmos:
 
 ```bash
+Terminal 1:
+cd /workspaces/CienciasII/ProyectoFinal
+source venv/bin/activate
 cd backend
-uvicorn conexion:app --reload --port 8000
+python -m uvicorn conexion:app --host 0.0.0.0 --port 8000
+
+Terminal 2:
+cd /workspaces/CienciasII/ProyectoFinal
+
+Abrir: http://127.0.0.1:8000/
+
+Para limpiar: lsof -i :8000
+pkill -f "uvicorn conexion:app" || true
+
+o
+
+fuser -k 8000/tcp || true
 ```
 
 Luego abre `frontend/index.html` en el navegador (o sírvelo con

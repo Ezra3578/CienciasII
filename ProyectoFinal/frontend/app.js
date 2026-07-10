@@ -1,4 +1,17 @@
-const API_BASE = "http://127.0.0.1:8000";
+function getApiBase() {
+  return "";
+}
+
+const API_BASE = getApiBase();
+
+async function fetchApi(path, options = {}) {
+  const res = await fetch(`${API_BASE}${path}`, options);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `El backend respondió con ${res.status}`);
+  }
+  return res;
+}
 
 // Paleta de colores para las zonas (opcional para futuras visualizaciones)
 const ZONE_COLORS = [
@@ -8,18 +21,19 @@ const ZONE_COLORS = [
 
 // Límites de Kamppi, Helsinki (aprox.)
 const KAMPPI_BOUNDS = [
-  [60.1620, 24.9200], // suroeste
-  [60.1720, 24.9400]  // noreste
+  [60.1600, 24.9180], // suroeste
+  [60.1830, 24.9450]  // noreste
 ];
 
 const map = L.map("map", {
   maxBounds: KAMPPI_BOUNDS,
-  maxBoundsViscosity: 1.0,
-}).setView([60.1670, 24.9300], 15);
+  maxBoundsViscosity: 2.0,
+}).setView([60.1730, 24.9300], 15);
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "&copy; OpenStreetMap contributors",
   maxZoom: 19,
+  minZoom: 14,
 }).addTo(map);
 
 // Datos
@@ -85,11 +99,11 @@ function redrawPoints() {
       deleteNode(dep);
     });
 
-    // Círculo opcional de 350 m (azul claro)
+    // Círculo opcional de 200 m (azul claro)
     L.circle([dep.lat, dep.lng], {
-      radius: 350,
-      color: '#add8e6',
-      fillColor: '#add8e6',
+      radius: 200,
+      color: '#5fbbd9',
+      fillColor: '#5fbbd9',
       fillOpacity: 0.15,
       weight: 1
     }).addTo(depotCirclesLayer);
@@ -128,14 +142,13 @@ function deleteNode(node) {
 
 // --- Eventos del mapa ---
 map.on("click", (e) => {
-  // Ignorar clicks sobre marcadores (se manejan por separado)
-  if (e.originalEvent.target.closest('.leaflet-marker-icon')) return;
+  const isCtrl = e.originalEvent.ctrlKey || e.originalEvent.metaKey;
+  // Solo ignoramos el clic sobre un marcador si NO es para agregar depot
+  if (!isCtrl && e.originalEvent.target.closest('.leaflet-marker-icon')) return;
 
   const { lat, lng } = e.latlng;
-  const ctrlPressed = e.originalEvent.ctrlKey || e.originalEvent.metaKey;
 
-  if (ctrlPressed) {
-    // Agregar depot con Ctrl+Click
+  if (isCtrl) {
     if (isDepotTooClose(lat, lng)) {
       alert("No se puede agregar depot: hay otro a menos de 350 m.");
       return;
@@ -143,7 +156,6 @@ map.on("click", (e) => {
     const name = getNextDepotLetter();
     depots.push({ name, lat, lng, type: "depot" });
   } else {
-    // Agregar entrega con click normal
     const name = getNextDeliveryNumber();
     deliveries.push({ name, lat, lng, type: "delivery" });
   }
@@ -169,12 +181,11 @@ document.getElementById("process-btn").addEventListener("click", async () => {
   setResults("Procesando...");
 
   try {
-    const res = await fetch(`${API_BASE}/process`, {
+    const res = await fetchApi("/process", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nodes: allNodes })
     });
-    if (!res.ok) throw new Error(await res.text());
     const data = await res.json();
 
     if (data.status === "en trabajo") {

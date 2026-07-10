@@ -25,7 +25,7 @@ import networkx as nx
 class Grafo:
     """Implementación en Python de RepresentacionGrafo (lista de adyacencia)."""
 
-    def __init__(self, lugar="Madrid, Cundinamarca, Colombia", network_type="drive"):
+    def __init__(self, lugar="Busbanza, Boyaca Colombia", network_type="drive"):
         print(f"Descargando red vial de '{lugar}' desde OpenStreetMap (osmnx)...")
         self.lugar = lugar
         self.red_vial = ox.graph_from_place(lugar, network_type=network_type)

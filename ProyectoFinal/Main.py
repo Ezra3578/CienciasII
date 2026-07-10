@@ -18,7 +18,7 @@ from Dijkstra import Dijkstra
 
 def main():
     # 1) Crear el grafo con la red vial de Madrid, Cundinamarca
-    grafo = Grafo(lugar="El Rosal, Cundinamarca, Colombia", network_type="drive")
+    grafo = Grafo(lugar="La Candelaria, Bogotá, Colombia", network_type="drive")
 
     # 2) ---------------------------------------------------------------
     #    PUNTOS DE DESPACHO
@@ -27,13 +27,13 @@ def main():
     #    nombre inventado); si el nombre es una dirección real, puedes omitir
     #    lat/lon y se geocodifica automáticamente.
     # --------------------------------------------------------------------
-    grafo.agregarNodo("Bodega_Central", lat=4.851453527058958, lon=-74.27001762359312)     # centro de Madrid, Cund.
+    grafo.agregarNodo("Bodega_Central", lat=4.871628056175239, lon=-74.54102158051356)     # centro de Madrid, Cund.
     grafo.agregarNodo("Centro_Despacho_2", lat=4.849896412944008, lon=-74.26834611458263)
 
     # PUNTOS DE ENTREGA
 
-    grafo.agregarNodo("Cliente_1", lat=4.856017820849208, lon=-74.26328633330014)
-    grafo.agregarNodo("Cliente_2", lat=4.851656132479957, lon=-74.26137714947366)
+    grafo.agregarNodo("Cliente_1", lat=4.87448764586175, lon=-74.53919231397099)
+    grafo.agregarNodo("Cliente_2", lat=4.872216010190496, lon=-74.53901528818456)
     grafo.agregarNodo("Cliente_3", lat=4.850154356527056, lon=-74.26061807203888)
 
     # 3) ---------------------------------------------------------------
@@ -43,6 +43,7 @@ def main():
     #    Opción B (la que se usa aquí): peso = distancia real en metros
     #       siguiendo la red vial, calculada automáticamente.
     # --------------------------------------------------------------------
+    
     grafo.agregarAristaAutomatica("Bodega_Central", "Cliente_1", bidireccional=True)
     grafo.agregarAristaAutomatica("Bodega_Central", "Cliente_2", bidireccional=True)
     grafo.agregarAristaAutomatica("Bodega_Central", "Centro_Despacho_2", bidireccional=True)
@@ -65,6 +66,8 @@ def main():
     # 5) ---------------------------------------------------------------
     #    GRAFICAR EL CAMINO ENCONTRADO SOBRE EL MAPA REAL
     # --------------------------------------------------------------------
+    
+    
     camino = dijkstra.getCaminoLista(punto_despacho, punto_entrega)
     if camino:
         grafo.dibujar_camino(
@@ -74,7 +77,7 @@ def main():
         )
     else:
         print("No se encontró un camino para graficar.")
-
+    
 
 if __name__ == "__main__":
     main()

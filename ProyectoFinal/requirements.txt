@@ -1,0 +1,5 @@
+fastapi
+uvicorn[standard]
+osmnx==2.1.0
+networkx
+python-tsp

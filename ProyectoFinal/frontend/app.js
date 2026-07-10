@@ -1,191 +1,240 @@
 const API_BASE = "http://127.0.0.1:8000";
 
-// Paleta fija de colores para las zonas (evita colores random poco distinguibles).
+// Paleta de colores para las zonas (opcional para futuras visualizaciones)
 const ZONE_COLORS = [
   "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231",
   "#911eb4", "#46f0f0", "#f032e6", "#bcf60c", "#fabebe",
 ];
 
-const map = L.map("map").setView([4.60971, -74.08175], 13); // Bogotá por defecto
+// Límites de Kamppi, Helsinki (aprox.)
+const KAMPPI_BOUNDS = [
+  [60.1620, 24.9200], // suroeste
+  [60.1720, 24.9400]  // noreste
+];
+
+const map = L.map("map", {
+  maxBounds: KAMPPI_BOUNDS,
+  maxBoundsViscosity: 1.0,
+}).setView([60.1670, 24.9300], 15);
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "&copy; OpenStreetMap contributors",
   maxZoom: 19,
 }).addTo(map);
 
-let depot = null; // {lat, lng}
-let deliveries = []; // [{lat, lng}, ...]
+// Datos
+let depots = [];          // { name, lat, lng, type: "depot" }
+let deliveries = [];      // { name, lat, lng, type: "delivery" }
+
+// Capas
 let markersLayer = L.layerGroup().addTo(map);
-let zonesLayer = L.layerGroup().addTo(map);
+let depotCirclesLayer = L.layerGroup().addTo(map);
+let hullsLayer = L.layerGroup().addTo(map);
 let routesLayer = L.layerGroup().addTo(map);
 
+// --- Funciones de ayuda para nombres ---
+function getNextDepotLetter() {
+  if (depots.length === 0) return "A";
+  const letters = depots.map(d => d.name).filter(n => /^[A-Z]$/.test(n));
+  const maxCode = letters.reduce((max, l) => Math.max(max, l.charCodeAt(0)), 64);
+  return String.fromCharCode(maxCode + 1);
+}
+
+function getNextDeliveryNumber() {
+  if (deliveries.length === 0) return "1";
+  const nums = deliveries.map(d => parseInt(d.name, 10)).filter(n => !isNaN(n));
+  const maxNum = nums.length ? Math.max(...nums) : 0;
+  return (maxNum + 1).toString();
+}
+
+// --- Distancia Haversine (en metros) ---
+function haversineDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const toRad = deg => deg * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2 +
+            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+            Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// --- Validación de depot (350 m de separación) ---
+function isDepotTooClose(lat, lng) {
+  return depots.some(d => haversineDistance(lat, lng, d.lat, d.lng) < 350);
+}
+
+// --- Redibujar puntos y círculos de depots ---
 function redrawPoints() {
   markersLayer.clearLayers();
+  depotCirclesLayer.clearLayers();
 
-  if (depot) {
-    L.marker([depot.lat, depot.lng], { title: "Depot" })
-      .bindPopup("Depot")
+  // Dibujar depots
+  depots.forEach(dep => {
+    const icon = L.divIcon({
+      className: 'depot-icon',
+      html: `<div style="background:#2563eb;color:white;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:bold;">${dep.name}</div>`,
+      iconSize: [24, 24],
+      iconAnchor: [12, 12]
+    });
+    const marker = L.marker([dep.lat, dep.lng], { icon, customData: dep })
+      .bindPopup(`Depot ${dep.name}`)
       .addTo(markersLayer);
-  }
+    marker.on('contextmenu', (e) => {
+      L.DomEvent.preventDefault(e);
+      deleteNode(dep);
+    });
 
-  deliveries.forEach((p, i) => {
-    L.circleMarker([p.lat, p.lng], {
-      radius: 6,
-      color: "#333",
-      fillColor: "#333",
-      fillOpacity: 0.8,
-    })
-      .bindPopup(`Entrega #${i + 1}`)
+    // Círculo opcional de 350 m (azul claro)
+    L.circle([dep.lat, dep.lng], {
+      radius: 350,
+      color: '#add8e6',
+      fillColor: '#add8e6',
+      fillOpacity: 0.15,
+      weight: 1
+    }).addTo(depotCirclesLayer);
+  });
+
+  // Dibujar entregas
+  deliveries.forEach(del => {
+    const icon = L.divIcon({
+      className: 'delivery-icon',
+      html: `<div style="background:#e6194b;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;">${del.name}</div>`,
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
+    });
+    const marker = L.marker([del.lat, del.lng], { icon, customData: del })
+      .bindPopup(`Entrega ${del.name}`)
       .addTo(markersLayer);
+    marker.on('contextmenu', (e) => {
+      L.DomEvent.preventDefault(e);
+      deleteNode(del);
+    });
   });
 }
 
-map.on("click", (e) => {
-  const { lat, lng } = e.latlng;
-  if (!depot) {
-    depot = { lat, lng };
+function deleteNode(node) {
+  if (node.type === "depot") {
+    depots = depots.filter(d => d.name !== node.name);
   } else {
-    deliveries.push({ lat, lng });
+    deliveries = deliveries.filter(d => d.name !== node.name);
+  }
+  redrawPoints();
+  // Limpiar resultados previos al eliminar nodos
+  hullsLayer.clearLayers();
+  routesLayer.clearLayers();
+  setResults("Nodo eliminado.");
+}
+
+// --- Eventos del mapa ---
+map.on("click", (e) => {
+  // Ignorar clicks sobre marcadores (se manejan por separado)
+  if (e.originalEvent.target.closest('.leaflet-marker-icon')) return;
+
+  const { lat, lng } = e.latlng;
+  const ctrlPressed = e.originalEvent.ctrlKey || e.originalEvent.metaKey;
+
+  if (ctrlPressed) {
+    // Agregar depot con Ctrl+Click
+    if (isDepotTooClose(lat, lng)) {
+      alert("No se puede agregar depot: hay otro a menos de 350 m.");
+      return;
+    }
+    const name = getNextDepotLetter();
+    depots.push({ name, lat, lng, type: "depot" });
+  } else {
+    // Agregar entrega con click normal
+    const name = getNextDeliveryNumber();
+    deliveries.push({ name, lat, lng, type: "delivery" });
   }
   redrawPoints();
 });
 
-document.getElementById("clear-points-btn").addEventListener("click", () => {
-  depot = null;
-  deliveries = [];
-  zonesLayer.clearLayers();
-  routesLayer.clearLayers();
-  redrawPoints();
-  setResults("Puntos limpiados.");
+map.on("contextmenu", (e) => {
+  // Previene el menú contextual del navegador en el mapa vacío
+  L.DomEvent.preventDefault(e);
 });
+
+// --- Botón de procesamiento ---
+document.getElementById("process-btn").addEventListener("click", async () => {
+  if (depots.length === 0) return alert("Agrega al menos un depot.");
+  if (deliveries.length === 0) return alert("Agrega al menos un punto de entrega.");
+
+  // Construir lista de nodos
+  const allNodes = [
+    ...depots.map(d => ({ name: d.name, type: d.type, longitude: d.lng, latitude: d.lat })),
+    ...deliveries.map(d => ({ name: d.name, type: d.type, longitude: d.lng, latitude: d.lat }))
+  ];
+
+  setResults("Procesando...");
+
+  try {
+    const res = await fetch(`${API_BASE}/process`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nodes: allNodes })
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+
+    if (data.status === "en trabajo") {
+      setResults("El servidor aún está en fase de desarrollo (respuesta 'en trabajo').");
+    }
+
+    // Dibujar convex hulls si existen
+    hullsLayer.clearLayers();
+    if (data.convex_hulls) {
+      drawConvexHulls(data.convex_hulls);
+    }
+
+    // Dibujar rutas si existen
+    routesLayer.clearLayers();
+    if (data.routes) {
+      drawRoutes(data.routes);
+    }
+
+  } catch (err) {
+    setResults(`Error: ${err.message}`);
+  }
+});
+
+function drawConvexHulls(hulls) {
+  // huls: { "1": { "A": [lon, lat], "1": [lon, lat], ... }, "2": {...} }
+  Object.entries(hulls).forEach(([regionId, points]) => {
+    const coords = Object.values(points).map(([lon, lat]) => [lat, lon]);
+    if (coords.length > 2) {
+      L.polygon(coords, {
+        color: ZONE_COLORS[(parseInt(regionId)-1) % ZONE_COLORS.length],
+        fillOpacity: 0.2,
+        weight: 2
+      }).addTo(hullsLayer).bindPopup(`Región ${regionId}`);
+    }
+  });
+}
+
+function drawRoutes(routes) {
+  // routes: { "1": { "id_region": 1, "route": ["A", "1", "3", "A"] }, ... }
+  // Se necesita buscar coordenadas por nombre
+  const nameToCoord = {};
+  [...depots, ...deliveries].forEach(node => {
+    nameToCoord[node.name] = [node.lat, node.lng];
+  });
+
+  Object.entries(routes).forEach(([routeId, info]) => {
+    const latlngs = info.route.map(name => nameToCoord[name]).filter(Boolean);
+    if (latlngs.length > 1) {
+      L.polyline(latlngs, {
+        color: ZONE_COLORS[(parseInt(info.id_region)-1) % ZONE_COLORS.length],
+        weight: 4,
+        opacity: 0.8
+      }).addTo(routesLayer).bindPopup(`Ruta ${routeId} (Región ${info.id_region})`);
+    }
+  });
+}
 
 function setResults(html) {
   document.getElementById("results-content").innerHTML = html;
 }
 
-// --- Etapa 1: construir grafo ---
-document.getElementById("build-graph-btn").addEventListener("click", async () => {
-  const place = document.getElementById("place-input").value.trim();
-  if (!place) return alert("Escribe un lugar, ej: 'Chía, Cundinamarca, Colombia'");
-
-  setResults("Construyendo grafo... (puede tardar según el tamaño de la ciudad)");
-
-  try {
-    const res = await fetch(`${API_BASE}/graph/build`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ place_name: place, network_type: "drive" }),
-    });
-    if (!res.ok) throw new Error(await res.text());
-    setResults(`Grafo construido para: <b>${place}</b>. Ahora haz clic en el mapa.`);
-  } catch (err) {
-    setResults(`Error construyendo el grafo: ${err.message}`);
-  }
-});
-
-// --- Etapa 2: coloreado / zonas ---
-document.getElementById("build-zones-btn").addEventListener("click", async () => {
-  if (!depot || deliveries.length === 0) {
-    return alert("Marca un depot y al menos un punto de entrega en el mapa.");
-  }
-
-  const conflictRadius = parseFloat(document.getElementById("conflict-radius").value);
-
-  setResults("Calculando zonas (coloreado de grafos)...");
-
-  try {
-    const res = await fetch(`${API_BASE}/zones/build`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        depot,
-        deliveries,
-        n_colors: null,
-        balance: true,
-      }),
-    });
-    if (!res.ok) throw new Error(await res.text());
-    const data = await res.json();
-
-    drawZones(data.zones);
-    setResults(`Zonas creadas: ${Object.keys(data.zones).length}`);
-  } catch (err) {
-    setResults(`Error creando zonas: ${err.message}`);
-  }
-});
-
-function drawZones(zones) {
-  zonesLayer.clearLayers();
-
-  Object.entries(zones).forEach(([color, points], idx) => {
-    const zoneColor = ZONE_COLORS[idx % ZONE_COLORS.length];
-    points.forEach((p) => {
-      L.circleMarker([p.lat, p.lng], {
-        radius: 8,
-        color: zoneColor,
-        fillColor: zoneColor,
-        fillOpacity: 0.9,
-      })
-        .bindPopup(`Zona ${color}`)
-        .addTo(zonesLayer);
-    });
-  });
-}
-
-// --- Etapa 3: planificar rutas por zona ---
-document.getElementById("plan-routes-btn").addEventListener("click", async () => {
-  if (!depot || deliveries.length === 0) {
-    return alert("Marca un depot y al menos un punto de entrega en el mapa.");
-  }
-
-  setResults("Planificando rutas por zona (TSP heurístico)...");
-
-  try {
-    const res = await fetch(`${API_BASE}/zones/plan-routes`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        depot,
-        deliveries,
-        n_colors: null,
-        balance: true,
-        tsp_method: "nn_2opt",
-      }),
-    });
-    if (!res.ok) throw new Error(await res.text());
-    const data = await res.json();
-
-    drawRoutes(data.zones);
-    renderResultsTable(data.zones);
-  } catch (err) {
-    setResults(`Error planificando rutas: ${err.message}`);
-  }
-});
-
-function drawRoutes(zones) {
-  routesLayer.clearLayers();
-
-  Object.entries(zones).forEach(([color, info], idx) => {
-    const zoneColor = ZONE_COLORS[idx % ZONE_COLORS.length];
-    const latlngs = info.ordered_points.map((p) => [p.lat, p.lng]);
-
-    L.polyline(latlngs, { color: zoneColor, weight: 4, opacity: 0.8 }).addTo(routesLayer);
-  });
-}
-
-function renderResultsTable(zones) {
-  let html = "";
-  Object.entries(zones).forEach(([color, info]) => {
-    html += `
-      <div class="zone-card">
-        <b>Zona ${color}</b><br/>
-        Distancia total: ${(info.total_distance_meters / 1000).toFixed(2)} km<br/>
-        Tiempo de cómputo: ${(info.compute_time_seconds * 1000).toFixed(1)} ms<br/>
-        Método: ${info.method}
-      </div>
-    `;
-  });
-  setResults(html || "Sin zonas.");
-}
-
+// Inicializar dibujo
 redrawPoints();

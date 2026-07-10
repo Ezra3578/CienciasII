@@ -30,24 +30,22 @@ body, html {
   margin-bottom: 18px;
 }
 
-#panel label {
-  display: block;
+.instructions {
+  background: #eef2ff;
+  padding: 10px;
+  border-radius: 6px;
   font-size: 0.85rem;
-  margin-bottom: 4px;
-  color: #444;
+  line-height: 1.5;
 }
 
-#panel input {
-  width: 100%;
-  padding: 6px;
-  margin-bottom: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.instructions ul {
+  padding-left: 18px;
+  margin: 6px 0 0;
 }
 
 #panel button {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   border: none;
   border-radius: 4px;
   background: #2563eb;
@@ -58,11 +56,6 @@ body, html {
 
 #panel button:hover {
   background: #1d4ed8;
-}
-
-.hint {
-  font-size: 0.8rem;
-  color: #666;
 }
 
 #map {
@@ -77,8 +70,8 @@ body, html {
   padding: 8px;
 }
 
-.zone-card {
-  margin-bottom: 8px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #eee;
+/* Estilos para los íconos de los marcadores (opcional, ya están en línea) */
+.depot-icon, .delivery-icon {
+  background: transparent;
+  border: none;
 }

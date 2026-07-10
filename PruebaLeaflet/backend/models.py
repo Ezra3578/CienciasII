@@ -14,7 +14,8 @@ class Point(BaseModel):
 
 
 class GraphBuildRequest(BaseModel):
-    place_name: str = Field(..., description="Ej: 'Chía, Cundinamarca, Colombia'")
+    #Ya no es necesario el place_name porque la región es fija
+    #place_name: str = Field(..., description="Ej: 'Chía, Cundinamarca, Colombia'")
     network_type: str = Field("drive", description="drive | walk | bike | all")
 
 

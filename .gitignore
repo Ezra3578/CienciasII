@@ -1,0 +1,18 @@
+# Ignorar entornos virtuales
+venv/
+ProyectoFinal/venv/
+
+# Ignorar cachés y compilados
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignorar librerías instaladas
+*.dist-info/
+*.egg-info/
+*.so
+
+# Ignorar configuraciones locales
+.env
+*.sqlite3

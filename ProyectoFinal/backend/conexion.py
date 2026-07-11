@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from typing import List
+from typing import Dict
 
 BASE_DIR = Path(__file__).resolve().parent
 FRONTEND_DIR = BASE_DIR.parent / "frontend"
@@ -19,14 +19,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class Node(BaseModel):
-    name: str
-    type: str          # "depot" o "delivery"
-    longitude: float
-    latitude: float
+class NodoData(BaseModel):
+    tipo_nodo: str
+    longitud: float
+    latitud: float
 
 class RequestData(BaseModel):
-    nodes: List[Node]
+    max_nodos: int
+    nodos: Dict[str, NodoData]
 
 @app.get("/")
 async def root():
@@ -38,9 +38,10 @@ async def health_check():
 
 @app.post("/process")
 async def process_data(data: RequestData):
+    print(f"Máximo de nodos por zona: {data.max_nodos}")
     print("Nodos recibidos:")
-    for node in data.nodes:
-        print(f"  {node.name} ({node.type}): lon={node.longitude}, lat={node.latitude}")
+    for nombre, nodo in data.nodos.items():
+        print(f"  {nombre} ({nodo.tipo_nodo}): lon={nodo.longitud}, lat={nodo.latitud}")
 
     # Respuesta provisional
     return {

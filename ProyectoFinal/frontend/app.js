@@ -73,7 +73,7 @@ function haversineDistance(lat1, lon1, lat2, lon2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-// --- Validación de depot (350 m de separación) ---
+// --- Validación de depot (200 m de separación) ---
 function isDepotTooClose(lat, lng) {
   return depots.some(d => haversineDistance(lat, lng, d.lat, d.lng) < 200);
 }
@@ -99,7 +99,7 @@ function redrawPoints() {
       deleteNode(dep);
     });
 
-    // Círculo opcional de 200 m (azul claro)
+    // Círculo de 200 m (azul claro)
     L.circle([dep.lat, dep.lng], {
       radius: 200,
       color: '#5fbbd9',
@@ -172,11 +172,16 @@ document.getElementById("process-btn").addEventListener("click", async () => {
   if (depots.length === 0) return alert("Agrega al menos un depot.");
   if (deliveries.length === 0) return alert("Agrega al menos un punto de entrega.");
 
-  // Construir lista de nodos
-  const allNodes = [
-    ...depots.map(d => ({ name: d.name, type: d.type, longitude: d.lng, latitude: d.lat })),
-    ...deliveries.map(d => ({ name: d.name, type: d.type, longitude: d.lng, latitude: d.lat }))
-  ];
+  const maxNodes = parseInt(document.getElementById("max-nodes-input").value, 10) || 5;
+
+  // Construir el objeto nodos con el nuevo formato
+  const nodosObj = {};
+  depots.forEach(d => {
+    nodosObj[d.name] = { tipo_nodo: d.type, longitud: d.lng, latitud: d.lat };
+  });
+  deliveries.forEach(d => {
+    nodosObj[d.name] = { tipo_nodo: d.type, longitud: d.lng, latitud: d.lat };
+  });
 
   setResults("Procesando...");
 
@@ -184,7 +189,7 @@ document.getElementById("process-btn").addEventListener("click", async () => {
     const res = await fetchApi("/process", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nodes: allNodes })
+      body: JSON.stringify({ max_nodos: maxNodes, nodos: nodosObj })
     });
     const data = await res.json();
 
@@ -210,7 +215,7 @@ document.getElementById("process-btn").addEventListener("click", async () => {
 });
 
 function drawConvexHulls(hulls) {
-  // huls: { "1": { "A": [lon, lat], "1": [lon, lat], ... }, "2": {...} }
+  // hulls: { "1": { "A": [lon, lat], "1": [lon, lat], ... }, "2": {...} }
   Object.entries(hulls).forEach(([regionId, points]) => {
     const coords = Object.values(points).map(([lon, lat]) => [lat, lon]);
     if (coords.length > 2) {

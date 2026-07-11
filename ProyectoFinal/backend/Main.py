@@ -1,83 +1,40 @@
-"""
-Main.py
--------
-Ejemplo de uso de Grafo.py + Dijkstra.py sobre la red vial real de
-Madrid, Cundinamarca, Colombia (obtenida con osmnx).
+from pathlib import Path
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
+from typing import List
 
-Flujo:
-    1. Crear el grafo (descarga la red vial real desde OpenStreetMap).
-    2. Agregar los puntos de despacho y los puntos de entrega (nodos lógicos).
-    3. Conectar esos puntos con aristas (peso manual o distancia real automática).
-    4. Ejecutar Dijkstra entre un punto de despacho y un punto de entrega.
-    5. Mostrar el resultado en texto y graficar el camino sobre el mapa real.
-"""
+from modules.graph import router as graph
 
-from Grafo import Grafo
-from Dijkstra import Dijkstra
-
+# Directorio absoluto del frontend (donde quedó index.html tras el zip/unzip)
+BASE_DIR = Path(__file__).resolve().parent.parent
+FRONTEND_DIR = BASE_DIR / "frontend"
 
 def main():
-    # 1) Crear el grafo con la red vial de Madrid, Cundinamarca
-    grafo = Grafo(lugar="La Candelaria, Bogotá, Colombia", network_type="drive")
+    app = FastAPI()
 
-    # 2) ---------------------------------------------------------------
-    #    PUNTOS DE DESPACHO
-    #    Agrega aquí tus bodegas / centros de despacho. Si conoces las
-    #    coordenadas exactas pásalas (es más confiable que geocodificar un
-    #    nombre inventado); si el nombre es una dirección real, puedes omitir
-    #    lat/lon y se geocodifica automáticamente.
-    # --------------------------------------------------------------------
-    grafo.agregarNodo("Bodega_Central", lat=4.871628056175239, lon=-74.54102158051356)     # centro de Madrid, Cund.
-    grafo.agregarNodo("Centro_Despacho_2", lat=4.849896412944008, lon=-74.26834611458263)
-
-    # PUNTOS DE ENTREGA
-
-    grafo.agregarNodo("Cliente_1", lat=4.87448764586175, lon=-74.53919231397099)
-    grafo.agregarNodo("Cliente_2", lat=4.872216010190496, lon=-74.53901528818456)
-    grafo.agregarNodo("Cliente_3", lat=4.850154356527056, lon=-74.26061807203888)
-
-    # 3) ---------------------------------------------------------------
-    #    ARISTAS
-    #    Opción A: peso manual, tal como en la interfaz original:
-    #       grafo.agregarArista("Bodega_Central", "Cliente_1", 10)
-    #    Opción B (la que se usa aquí): peso = distancia real en metros
-    #       siguiendo la red vial, calculada automáticamente.
-    # --------------------------------------------------------------------
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     
-    grafo.agregarAristaAutomatica("Bodega_Central", "Cliente_1", bidireccional=True)
-    grafo.agregarAristaAutomatica("Bodega_Central", "Cliente_2", bidireccional=True)
-    grafo.agregarAristaAutomatica("Bodega_Central", "Centro_Despacho_2", bidireccional=True)
-    grafo.agregarAristaAutomatica("Centro_Despacho_2", "Cliente_2", bidireccional=True)
-    grafo.agregarAristaAutomatica("Centro_Despacho_2", "Cliente_3", bidireccional=True)
-    grafo.agregarAristaAutomatica("Cliente_1", "Cliente_3", bidireccional=True)
+    # Rutas de cada módulo
+    app.include_router(graph.router)
 
-    # 4) ---------------------------------------------------------------
-    #    DIJKSTRA: un punto de despacho -> un punto de entrega
-    # --------------------------------------------------------------------
-    dijkstra = Dijkstra(grafo)
+    @app.get("/")
+    async def root():
+        return FileResponse(FRONTEND_DIR / "index.html")
 
-    punto_despacho = "Bodega_Central"
-    punto_entrega = "Cliente_3"
+    @app.get("/health")
+    async def health():
+        return {"status": "ok"}
 
-    print(dijkstra.getDistancia(punto_despacho, punto_entrega))
-    print(dijkstra.getCamino(punto_despacho, punto_entrega))
-    print(f"Pasos realizados por el algoritmo: {dijkstra.getPasos()}")
-
-    # 5) ---------------------------------------------------------------
-    #    GRAFICAR EL CAMINO ENCONTRADO SOBRE EL MAPA REAL
-    # --------------------------------------------------------------------
-    
-    
-    camino = dijkstra.getCaminoLista(punto_despacho, punto_entrega)
-    if camino:
-        grafo.dibujar_camino(
-            camino,
-            titulo=f"Ruta más corta: {punto_despacho} -> {punto_entrega}",
-            guardar_como="ruta_dijkstra.png",
-        )
-    else:
-        print("No se encontró un camino para graficar.")
-    
+    return app
 
 if __name__ == "__main__":
     main()

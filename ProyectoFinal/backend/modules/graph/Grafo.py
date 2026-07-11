@@ -29,6 +29,7 @@ class Grafo:
         print(f"Descargando red vial de '{lugar}' desde OpenStreetMap (osmnx)...")
         self.lugar = lugar
         self.red_vial = ox.graph_from_place(lugar, network_type=network_type)
+        self.tipos_nodo = {}   # nodo_logico -> "entrega" | "depot"
         self.aristas = {}       # nodo_logico -> {vecino: peso}
         self.coordenadas = {}   # nodo_logico -> (lat, lon)
         self.nodo_osmnx = {}    # nodo_logico -> id del nodo más cercano en red_vial
@@ -39,7 +40,7 @@ class Grafo:
     # Métodos de la interfaz RepresentacionGrafo
     # ------------------------------------------------------------------
 
-    def agregarNodo(self, nombre_nodo, lat=None, lon=None):
+    def agregarNodo(self, nombre_nodo, tipo_nodo, lat=None, lon=None):
         """
         Agrega un nodo lógico (punto de despacho o de entrega).
         Si no se dan lat/lon, se intenta geocodificar el nombre dentro de
@@ -63,8 +64,15 @@ class Grafo:
         nodo_cercano = ox.distance.nearest_nodes(self.red_vial, X=lon, Y=lat)
 
         self.aristas[nombre_nodo] = {}
+        self.tipos_nodo[nombre_nodo] = tipo_nodo
         self.coordenadas[nombre_nodo] = (lat, lon)
         self.nodo_osmnx[nombre_nodo] = nodo_cercano
+
+    def getDepositos(self):
+        return [n for n, t in self.tipos_nodo.items() if t == "depot"]
+
+    def getEntregas(self):
+        return [n for n, t in self.tipos_nodo.items() if t == "entrega"]
 
     def eliminarNodo(self, nombre_nodo):
         if nombre_nodo not in self.aristas:

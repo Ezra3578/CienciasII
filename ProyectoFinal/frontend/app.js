@@ -22,18 +22,18 @@ const ZONE_COLORS = [
 // Límites de Kamppi, Helsinki (aprox.)
 const KAMPPI_BOUNDS = [
   [60.1600, 24.9180], // suroeste
-  [60.1830, 24.9450]  // noreste
+  [60.1725, 24.9450]  // noreste
 ];
 
 const map = L.map("map", {
   maxBounds: KAMPPI_BOUNDS,
   maxBoundsViscosity: 2.0,
-}).setView([60.1730, 24.9300], 15);
+}).setView([60.1665, 24.9300], 16);
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "&copy; OpenStreetMap contributors",
-  maxZoom: 19,
-  minZoom: 14,
+  maxZoom: 20,
+  minZoom: 16,
 }).addTo(map);
 
 // Datos

@@ -2,7 +2,7 @@ from shared.schemas import NodoInput
 from pydantic import BaseModel
 
 class GrafoConstruirRequest(BaseModel):
-    #lugar: str = "Kamppi, Helsinki, Finland"
+    max_nodos: int
     nodos: dict[str, NodoInput]   # el dict que manda el front, ya validado
 
 class GrafoConstruirResponse(BaseModel):

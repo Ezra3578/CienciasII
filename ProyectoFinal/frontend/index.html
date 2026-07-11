@@ -26,6 +26,11 @@
       </section>
 
       <section>
+        <label for="max-nodes-input">Nodos máximos por zona</label>
+        <input id="max-nodes-input" type="number" min="1" value="1" />
+      </section>
+
+      <section>
         <button id="process-btn">Procesar y obtener rutas</button>
       </section>
 
@@ -38,6 +43,12 @@
     <main id="map"></main>
   </div>
 
+  <script>
+    if (window.location.hostname.includes("-5500.")) {
+      const target = window.location.href.replace("-5500.", "-8000.");
+      window.location.replace(target);
+    }
+  </script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="app.js"></script>
 </body>

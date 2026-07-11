@@ -38,8 +38,23 @@ recibe lo que manda el front, lo imprime por consola, y responde
 algoritmos:
 
 ```bash
+Terminal 1:
+cd /workspaces/CienciasII/ProyectoFinal
+source venv/bin/activate
 cd backend
-uvicorn conexion:app --reload --port 8000
+python -m uvicorn conexion:app --host 0.0.0.0 --port 8000
+
+Terminal 2:
+cd /workspaces/CienciasII/ProyectoFinal
+
+Abrir: http://127.0.0.1:8000/
+
+Para limpiar: lsof -i :8000
+pkill -f "uvicorn conexion:app" || true
+
+o
+
+fuser -k 8000/tcp || true
 ```
 
 Luego abre `frontend/index.html` en el navegador (o sírvelo con
@@ -59,9 +74,7 @@ fijado al barrio de Kamppi, Helsinki, Finlandia.
    hacer zoom pero no desplazar la vista fuera del barrio):
    - **Clic izquierdo** → nodo de entrega (numerado 1, 2, 3...).
    - **Ctrl + clic izquierdo** → depot (nombrado A, B, C...). No se
-     permite colocar un depot a menos de 350 m de otro ya existente.
-     Mientras mantienes Ctrl presionado, se ven en azul claro los radios
-     de 350 m de los depots ya puestos.
+     permite colocar un depot a menos de 200 m de otro ya existente.
    - **Clic derecho** sobre un nodo → lo elimina.
 3. Pulsa **"2. Construir zonas"** — llama a `/zonas/construir` con todos
    los nodos y la distancia máxima de agrupamiento. A futuro: Floyd-Warshall
@@ -75,9 +88,12 @@ fijado al barrio de Kamppi, Helsinki, Finlandia.
 
 ```json
 {
-  "1": { "tipo_nodo": "entrega", "longitud": 24.9312, "latitud": 60.1690 },
-  "2": { "tipo_nodo": "entrega", "longitud": 24.9325, "latitud": 60.1683 },
-  "A": { "tipo_nodo": "depot",   "longitud": 24.9300, "latitud": 60.1678 }
+  "max_nodos": 2,
+  "nodos": {
+    "1": { "tipo_nodo": "entrega", "longitud": 24.9312, "latitud": 60.1690 },
+    "2": { "tipo_nodo": "entrega", "longitud": 24.9325, "latitud": 60.1683 },
+    "A": { "tipo_nodo": "depot",   "longitud": 24.9300, "latitud": 60.1678 }
+  }
 }
 ```
 

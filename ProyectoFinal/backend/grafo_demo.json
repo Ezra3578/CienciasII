@@ -2,7 +2,7 @@
   "directed": true,
   "multigraph": true,
   "graph": {
-    "created_date": "2026-07-11 15:47:46",
+    "created_date": "2026-07-12 01:15:51",
     "created_with": "OSMnx 2.1.0",
     "crs": "epsg:4326",
     "simplified": true
@@ -1384,8 +1384,8 @@
       "maxspeed": "30",
       "name": "Annankatu",
       "width": [
-        "10",
-        "8.9"
+        "8.9",
+        "10"
       ],
       "oneway": false,
       "reversed": false,
@@ -2478,8 +2478,8 @@
       "highway": "residential",
       "maxspeed": "30",
       "name": [
-        "Köydenpunojankatu",
-        "Eerikinkatu"
+        "Eerikinkatu",
+        "Köydenpunojankatu"
       ],
       "oneway": false,
       "reversed": [
@@ -2956,8 +2956,8 @@
       ],
       "maxspeed": "30",
       "name": [
-        "Eteläinen Rautatiekatu",
-        "Arkadiankatu"
+        "Arkadiankatu",
+        "Eteläinen Rautatiekatu"
       ],
       "oneway": false,
       "reversed": [
@@ -3636,8 +3636,8 @@
       "lanes": "2",
       "maxspeed": "30",
       "name": [
-        "Ruoholahdenkatu",
-        "Ruoholahdenranta"
+        "Ruoholahdenranta",
+        "Ruoholahdenkatu"
       ],
       "oneway": false,
       "reversed": [
@@ -4209,9 +4209,9 @@
       ],
       "highway": "primary",
       "lanes": [
+        "4",
         "2",
-        "3",
-        "4"
+        "3"
       ],
       "maxspeed": [
         "30",
@@ -5335,8 +5335,8 @@
       ],
       "highway": "primary",
       "lanes": [
-        "3",
-        "4"
+        "4",
+        "3"
       ],
       "maxspeed": "40",
       "name": "Mechelininkatu",
@@ -5556,8 +5556,8 @@
       "lanes": "2",
       "maxspeed": "30",
       "name": [
-        "Urho Kekkosen katu",
-        "Annankatu"
+        "Annankatu",
+        "Urho Kekkosen katu"
       ],
       "oneway": false,
       "reversed": false,
@@ -5999,8 +5999,8 @@
       ],
       "highway": "primary",
       "lanes": [
-        "3",
-        "4"
+        "4",
+        "3"
       ],
       "maxspeed": "40",
       "name": "Mechelininkatu",
@@ -7252,8 +7252,8 @@
       "lanes": "2",
       "maxspeed": "30",
       "name": [
-        "Urho Kekkosen katu",
-        "Annankatu"
+        "Annankatu",
+        "Urho Kekkosen katu"
       ],
       "oneway": false,
       "reversed": true,
@@ -7711,8 +7711,8 @@
       "reversed": false,
       "length": 99.87884120573548,
       "width": [
-        "6",
-        "4.5"
+        "4.5",
+        "6"
       ],
       "geometry": [
         [
@@ -9519,8 +9519,8 @@
       "lanes": "2",
       "maxspeed": "30",
       "name": [
-        "Köydenpunojankatu",
-        "Eerikinkatu"
+        "Eerikinkatu",
+        "Köydenpunojankatu"
       ],
       "oneway": false,
       "reversed": [
@@ -9620,8 +9620,8 @@
       "lanes": "2",
       "maxspeed": "30",
       "name": [
-        "Ruoholahdenkatu",
-        "Ruoholahdenranta"
+        "Ruoholahdenranta",
+        "Ruoholahdenkatu"
       ],
       "oneway": false,
       "reversed": [
@@ -11704,8 +11704,8 @@
       "highway": "residential",
       "maxspeed": "30",
       "name": [
-        "Työmiehenkatu",
-        "Lastenkodinkatu"
+        "Lastenkodinkatu",
+        "Työmiehenkatu"
       ],
       "oneway": true,
       "reversed": false,
@@ -12047,8 +12047,8 @@
       "maxspeed": "30",
       "name": "Annankatu",
       "width": [
-        "10",
-        "8.9"
+        "8.9",
+        "10"
       ],
       "oneway": false,
       "reversed": true,
@@ -12225,8 +12225,8 @@
       ],
       "highway": "tertiary",
       "lanes": [
-        "2",
-        "1"
+        "1",
+        "2"
       ],
       "maxspeed": "30",
       "name": "Fredrikinkatu",
@@ -12930,9 +12930,9 @@
       ],
       "highway": "primary",
       "lanes": [
+        "4",
         "2",
-        "3",
-        "4"
+        "3"
       ],
       "maxspeed": "40",
       "name": "Mechelininkatu",

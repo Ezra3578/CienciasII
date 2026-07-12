@@ -1,111 +1,151 @@
 # Delivery Zoning & Routing (esqueleto)
 
-Pipeline: **Dijkstra (OSMnx)** → **coloreado de grafos (zonas)** → **TSP heurístico por zona**.
+Backend que recibe depots y puntos de entrega sobre el barrio de
+**Kamppi, Helsinki, Finlandia** (región fija del proyecto) y calcula:
+
+- **Zonas de reparto**: cada entrega se asigna a su depot más cercano
+  por distancia real de red vial (no en línea recta), y se calcula el
+  polígono (convex hull) que envuelve a cada depot con sus entregas.
+- **Rutas**: el camino más corto (por calles) de cada depot a cada una
+  de sus entregas asignadas, corriendo una implementación propia de
+  Dijkstra sobre un grafo de negocio construido encima de la red vial
+  real (OSMnx).
 
 ## Estructura
 
 ```
-delivery_project/
+ProyectoFinal/
 ├── backend/
-│   ├── main.py              # FastAPI: endpoints de las 3 etapas
-│   ├── graph_service.py     # Etapa 1: grafo OSMnx + Dijkstra
-│   ├── coloring_service.py  # Etapa 2: coloreado de grafos + balanceo
-│   ├── routing_service.py   # Etapa 3: TSP heurístico (NN + 2-opt)
-│   └── models.py            # Modelos Pydantic
+│   ├── main.py              # Entry point FastAPI(endpoints) + modo demo por consola
+│   ├── graph_service.py     # Red vial compartida (OSMnx, Kamppi): descarga, cache, Dijkstra base
+│   ├── graph_adapter.py     # Grafo de negocio por request (depot/delivery), apoyado en graph_service.py
+│   ├── Dijkstra.py          # Implementación propia del algoritmo (no usa el Dijkstra de networkx)
+│   ├── graph_visualizer.py  # Visualización aparte del grafo completo (ventana Tkinter o PNG si es headless)
+│   └── requirements.txt
 ├── frontend/
-│   ├── index.html           # Mapa Leaflet + panel de control
-│   ├── app.js                # Lógica: llamadas a la API, dibujo de zonas/rutas
+│   ├── index.html           # Mapa Leaflet + panel de control, fijado a Kamppi
+│   ├── app.js                # Llamadas a la API, dibujo de nodos/zonas/rutas
 │   └── style.css
-├── requirements.txt
 └── README.md
 ```
+> `graph_service.py` es el único que descarga y cachea la red vial
+> (un singleton en memoria, compartido por todos los requests).
+> `graph_adapter.py` crea una instancia nueva por cada request con los
+> depots/entregas de esa petición — nunca modifica el grafo compartido.
 
 ## Instalación
 
 ```bash
+cd ProyectoFinal
 python -m venv venv
-source venv/bin/activate  # en Windows: venv\Scripts\activate
+source venv/bin/activate  
 pip install -r requirements.txt
 ```
 
-## Ejecución (versión actual del front, con `conexion.py` como stub)
-
-El proyecto está en transición hacia el nuevo pipeline (Floyd-Warshall +
-Monotone chain + Dijkstra anidado). Por ahora el backend real de ese
-pipeline **no** está implementado; `conexion.py` es un stub que solo
-recibe lo que manda el front, lo imprime por consola, y responde
-`{"mensaje": "en trabajo"}`. Úsalo así mientras se desarrollan los
-algoritmos:
+## Ejecución
 
 ```bash
-Terminal 1:
-cd /workspaces/CienciasII/ProyectoFinal
-source venv/bin/activate
+# servidor 
 cd backend
-python -m uvicorn conexion:app --host 0.0.0.0 --port 8000
+uvicorn main:app --reload --port 8000
 
-Terminal 2:
-cd /workspaces/CienciasII/ProyectoFinal
+# otro comando que corre el servidor
+python main.py
 
-Abrir: http://127.0.0.1:8000/
+#demo por consola (Dijkstra + gráfico), sin servidor
+python main.py --demo
 
-Para limpiar: lsof -i :8000
-pkill -f "uvicorn conexion:app" || true
+# visualizador del grafo completo (aparte, sin cambios)
+python graph_visualizer.py
+```
 
-o
+En otra terminal, sirve el frontend:
 
+```bash
+cd ProyectoFinal/frontend
+python -m http.server 8080
+```
+
+
+Abre `http://localhost:8080` — el front está fijado al barrio de
+Kamppi, Helsinki (no se puede desplazar el mapa fuera de esa zona).
+
+Para limpiar procesos colgados en el puerto del backend:
+
+```bash
+lsof -i :8000
 fuser -k 8000/tcp || true
 ```
 
-Luego abre `frontend/index.html` en el navegador (o sírvelo con
-Live Server / `python -m http.server` desde `frontend/`). El front está
-fijado al barrio de Kamppi, Helsinki, Finlandia.
+## Endpoints
 
-> Nota: `main.py` (el pipeline anterior con OSMnx + coloreado clásico +
-> TSP) sigue existiendo tal cual, pero no está conectado al front actual.
-> No corras `main.py` y `conexion.py` al mismo tiempo en el puerto 8000.
+### `POST /process`
 
-## Flujo de uso en la interfaz
+Recibe los nodos colocados en el mapa y devuelve zonas + rutas.
 
-1. Pulsa **"1. Construir grafo (Kamppi)"** — llama a `/grafo/construir`
-   (por ahora solo confirma la solicitud; a futuro descargará la red vial
-   de Kamppi con OSMnx).
-2. Coloca nodos directamente en el mapa (limitado a Kamppi; se puede
-   hacer zoom pero no desplazar la vista fuera del barrio):
-   - **Clic izquierdo** → nodo de entrega (numerado 1, 2, 3...).
-   - **Ctrl + clic izquierdo** → depot (nombrado A, B, C...). No se
-     permite colocar un depot a menos de 200 m de otro ya existente.
-   - **Clic derecho** sobre un nodo → lo elimina.
-3. Pulsa **"2. Construir zonas"** — llama a `/zonas/construir` con todos
-   los nodos y la distancia máxima de agrupamiento. A futuro: Floyd-Warshall
-   para distancias entre todos los nodos, agrupamiento y Monotone chain
-   para el convex hull de cada zona.
-4. Pulsa **"3. Planificar rutas"** — llama a `/rutas/planificar` con todos
-   los nodos. A futuro: Dijkstra anidado dentro de cada zona y métricas de
-   carga por zona.
-
-### Formato de datos enviado al backend
-
+**Request:**
 ```json
 {
-  "max_nodos": 2,
-  "nodos": {
-    "1": { "tipo_nodo": "entrega", "longitud": 24.9312, "latitud": 60.1690 },
-    "2": { "tipo_nodo": "entrega", "longitud": 24.9325, "latitud": 60.1683 },
-    "A": { "tipo_nodo": "depot",   "longitud": 24.9300, "latitud": 60.1678 }
-  }
+  "nodes": [
+    { "name": "A", "type": "depot",    "longitude": 24.9300, "latitude": 60.1678 },
+    { "name": "1", "type": "delivery", "longitude": 24.9312, "latitude": 60.1690 },
+    { "name": "2", "type": "delivery", "longitude": 24.9325, "latitude": 60.1683 }
+  ]
 }
 ```
 
-## Próximos pasos sugeridos
+**Response:**
+```json
+{
+  "status": "ok",
+  "convex_hulls": {
+    "A": [ { "lat": 60.1678, "lng": 24.9300 }, "..." ]
+  },
+  "routes": {
+    "A": [
+      {
+        "delivery": "1",
+        "geojson": { "type": "Feature", "geometry": { "type": "LineString", "coordinates": ["..."] } },
+        "distancia_metros": 484.37
+      }
+    ]
+  },
+  "sin_asignar": []
+}
+```
 
-- **Balanceo de carga más robusto**: reemplazar `rebalance_colors`
-  (heurística local simple) por un modelo de OR-Tools (CP-SAT) si el
-  balanceo es un requisito estricto de evaluación.
-- **Comparar heurísticas de TSP**: añadir `python-tsp` (recocido
-  simulado) como referencia frente a NN+2-opt, y mostrar ambos tiempos
-  en la tabla de resultados.
-- **Persistir el grafo**: guardar con `ox.save_graphml()` para no
-  re-descargar en cada reinicio del servidor durante desarrollo.
-- **Autenticación/CORS**: restringir `allow_origins` en `main.py`
-  antes de cualquier despliegue fuera de localhost.
+`sin_asignar` lista las entregas que no tenían camino a ningún depot
+(red vial desconectada entre esos puntos), en vez de romper la
+respuesta completa.
+
+### `GET /graph/data`
+
+Devuelve el grafo vial completo de Kamppi en formato node-link JSON
+(nodos y aristas de OSMnx, con `node_type` y el resto de atributos ya
+saneados para ser serializables), para que el front pueda dibujar la
+malla de calles como mapa base. Puede pesar varios MB.
+
+## Flujo de uso en la interfaz
+
+1. Coloca nodos directamente en el mapa (limitado a Kamppi):
+   - **Clic izquierdo** → punto de entrega.
+   - **Ctrl + clic izquierdo** → depot.
+   - **Clic derecho** sobre un nodo → lo elimina.
+2. Pulsa el botón de procesar — llama a `POST /process` con todos los
+   nodos actuales.
+3. El front dibuja los polígonos de zona (`convex_hulls`) y las rutas
+   reales (`routes`) que devuelve el backend.
+
+## Notas de diseño
+
+- El rol de cada nodo (`depot`/`deploy`) se guarda **por request**, en
+  la instancia de `GrafoLogico` (`graph_adapter.py`), nunca en el
+  grafo compartido de `graph_service.py` — evita que dos requests
+  concurrentes se pisen el estado.
+- El grafo de negocio conecta solo **depot ↔ entrega** (bipartito); no
+  hay aristas entrega↔entrega ni depot↔depot, porque `Dijkstra.py` no
+  las necesita para este flujo.
+- La asignación entrega→depot es por **distancia real de red vial**
+  más corta, calculada con el Dijkstra de `networkx` sobre la red vial
+  completa (`graph_service.py`), no con el Dijkstra manual (ese se usa
+  solo dentro del grafo de negocio bipartito, ya reducido).

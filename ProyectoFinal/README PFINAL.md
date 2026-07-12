@@ -93,6 +93,9 @@ Recibe los nodos colocados en el mapa y devuelve zonas + rutas.
     { "name": "1", "type": "delivery", "longitude": 24.9312, "latitude": 60.1690 },
     { "name": "2", "type": "delivery", "longitude": 24.9325, "latitude": 60.1683 }
   ]
+  "max_nodos_por_zona": [
+    "maxNodes":"1"
+  ]
 }
 ```
 

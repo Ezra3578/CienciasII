@@ -1,6 +1,10 @@
 # Ignorar entornos virtuales
 venv/
 ProyectoFinal/venv/
+.venv/
+env/
+.env/
+ENV/
 
 # Ignorar cachés y compilados
 __pycache__/

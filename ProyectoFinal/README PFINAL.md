@@ -46,6 +46,8 @@ pip install -r requirements.txt
 
 ```bash
 # servidor 
+cd /workspaces/CienciasII/ProyectoFinal
+source venv/bin/activate
 cd backend
 uvicorn main:app --reload --port 8000
 
@@ -97,20 +99,31 @@ Recibe los nodos colocados en el mapa y devuelve zonas + rutas.
 **Response:**
 ```json
 {
-  "status": "ok",
-  "convex_hulls": {
-    "A": [ { "lat": 60.1678, "lng": 24.9300 }, "..." ]
-  },
-  "routes": {
-    "A": [
-      {
-        "delivery": "1",
-        "geojson": { "type": "Feature", "geometry": { "type": "LineString", "coordinates": ["..."] } },
-        "distancia_metros": 484.37
-      }
+  "id_región (1,2,3,4,...)": {
+    "frontera": [
+      { "nombre": "1", "longitud": 24.9300, "latitud": 60.1678 },
+      { "nombre": "3", "longitud": 24.9312, "latitud": 60.1690 },
+      { "nombre": "5", "longitud": 24.9330, "latitud": 60.1682 }
+    ],
+    "ruta": [
+      { "nombre": "7", "longitud": 24.9300, "latitud": 60.1678 },
+      { "nombre": "3", "longitud": 24.9312, "latitud": 60.1690 },
+      { "nombre": "1", "longitud": 24.9315, "latitud": 60.1685 },
+      { "nombre": "5", "longitud": 24.9330, "latitud": 60.1682 },
+      { "nombre": "2", "longitud": 24.9300, "latitud": 60.1678 }
     ]
   },
-  "sin_asignar": []
+  "id_región2": {
+    "frontera": [
+      { "nombre": "B", "longitud": 24.9280, "latitud": 60.1700 },
+      { "nombre": "7", "longitud": 24.9295, "latitud": 60.1712 }
+    ],
+    "ruta": [
+      { "nombre": "B", "longitud": 24.9280, "latitud": 60.1700 },
+      { "nombre": "7", "longitud": 24.9295, "latitud": 60.1712 },
+      { "nombre": "B", "longitud": 24.9280, "latitud": 60.1700 }
+    ]
+  }
 }
 ```
 

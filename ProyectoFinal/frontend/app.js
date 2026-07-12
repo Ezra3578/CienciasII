@@ -189,7 +189,7 @@ document.getElementById("process-btn").addEventListener("click", async () => {
     const res = await fetchApi("/process", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nodes: nodesPayload })
+      body: JSON.stringify({ nodes: nodesPayload, max_nodos_por_zona: maxNodes })
     });
     const data = await res.json();
 

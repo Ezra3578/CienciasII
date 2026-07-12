@@ -39,6 +39,7 @@ import graph_service
 from graph_adapter import GrafoLogico
 from Dijkstra import Dijkstra
 from FloydWarshall import FloydWarshall
+from kmedoids_balanceado import zonificar
 
 app = FastAPI()
 FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
@@ -61,6 +62,7 @@ class Node(BaseModel):
 
 class RequestData(BaseModel):
     nodes: List[Node]
+    max_nodos_por_zona: int = 4
 
 
 @app.get("/")
@@ -161,11 +163,58 @@ async def process_data(data: RequestData):
     )
 
 
-    asignacion, sin_asignar = _asignar_depot_mas_cercano(grafo, depots, deliveries)
+    #asignacion, sin_asignar = _asignar_depot_mas_cercano(grafo, depots, deliveries)
 
     #Aquí se ejecuta el algoritmo de Floyd Warshall (no toqué lo del Dijkstra por si acaso xD)
     fw = FloydWarshall(grafo)
     fw.calcularTodasLasDistancias()
+    matriz = fw.getMatrizDistancias()
+ 
+    nombres_depots = [d.name for d in depots]
+
+    entregas_alcanzables = []
+    sin_asignar = []
+    #verifica que sean alcanzable spara el algoritmo hungaro
+    for entrega in deliveries:
+        if any(matriz[entrega.name][d] != float("inf") for d in nombres_depots):
+            entregas_alcanzables.append(entrega.name)
+        else:
+            sin_asignar.append(entrega.name)
+ 
+    regiones = {}
+    depositos_con_zona = set()
+ 
+    if entregas_alcanzables:
+        matrices_zona, resumen_zonas = zonificar(
+            fw, nombres_depots, entregas_alcanzables, data.max_nodos_por_zona
+        )
+ 
+        for zona in resumen_zonas:
+            nombre = zona["nombre"]
+            deposito_zona = zona["deposito"]
+            depositos_con_zona.add(deposito_zona)
+
+            nodos_zona = list(matrices_zona[nombre].keys())  # entregas + su deposito
+            frontera_puntos = _convex_hull(grafo, nodos_zona)
+            frontera = [
+                {
+                    "nombre": nodos_zona[i % len(nodos_zona)] if nodos_zona else f"p{i + 1}",
+                    "longitud": punto["lng"],
+                    "latitud": punto["lat"],
+                }
+                for i, punto in enumerate(frontera_puntos)
+            ]
+            regiones[nombre] = {
+                "frontera": frontera,
+            }
+ 
+    depositos_sin_zona = [d for d in nombres_depots if d not in depositos_con_zona]
+    if depositos_sin_zona:
+        regiones["depositos_sin_zona"] = depositos_sin_zona
+ 
+    if sin_asignar:
+        regiones["sin_asignar"] = sin_asignar
+    return regiones
 
     # dijkstra = Dijkstra(grafo)
     regiones = {}
@@ -430,6 +479,35 @@ def _demo():
 
     print("=== MATRIZ DE DISTANCIAS ===")
     imprimir_matriz(fw)
+    nombres_depots = ["Bodega_Central", "Bodega_Norte"]
+    nombres_entregas = [f"Cliente_{i}" for i in range(1, 9)]
+    max_nodos_por_zona = 4
+
+    print(f"\n=== ZONIFICACIÓN (max_nodos_por_zona={max_nodos_por_zona}) ===")
+    matrices_zona, resumen_zonas = zonificar( fw, nombres_depots, nombres_entregas, max_nodos_por_zona)
+
+    if not resumen_zonas:
+        print("No se generaron zonas (revisar zonificar()).")
+        return
+
+    for zona in resumen_zonas:
+        nombre = zona["nombre"]
+        deposito = zona["deposito"]
+        entregas = zona["entregas"]
+
+        print(f"\nZona '{nombre}': depósito={deposito}, "
+              f"entregas={entregas}, "
+              f"cantidad_entregas={zona['cantidad_entregas']}, "
+              f"cantidad_nodos={zona['cantidad_nodos']}")
+
+    # Revisar balance
+    tamanos = [zona["cantidad_nodos"] for zona in resumen_zonas]
+    print(f"\nTamanos de zona (nodos): {tamanos}")
+    print(f"Máximo permitido por zona: {max_nodos_por_zona}")
+    if any(t > max_nodos_por_zona+1 for t in tamanos):
+        print("Alguna zona excede el máximo permitido.")
+    else:
+        print("Todas las zonas respetan el límite de nodos.")
 
 def imprimir_matriz(fw):
     matriz = fw.getMatrizDistancias()

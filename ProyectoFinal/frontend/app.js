@@ -1,5 +1,9 @@
 function getApiBase() {
-  return "";
+  if (window.location.hostname.endsWith(".app.github.dev")) {
+    return "";
+  }
+
+  return "http://127.0.0.1:8000";
 }
 
 const API_BASE = getApiBase();
@@ -174,14 +178,10 @@ document.getElementById("process-btn").addEventListener("click", async () => {
 
   const maxNodes = parseInt(document.getElementById("max-nodes-input").value, 10) || 5;
 
-  // Construir el objeto nodos con el nuevo formato
-  const nodosObj = {};
-  depots.forEach(d => {
-    nodosObj[d.name] = { tipo_nodo: d.type, longitud: d.lng, latitud: d.lat };
-  });
-  deliveries.forEach(d => {
-    nodosObj[d.name] = { tipo_nodo: d.type, longitud: d.lng, latitud: d.lat };
-  });
+  const nodesPayload = [
+    ...depots.map(d => ({ name: d.name, type: "depot", longitude: d.lng, latitude: d.lat })),
+    ...deliveries.map(d => ({ name: d.name, type: "deploy", longitude: d.lng, latitude: d.lat }))
+  ];
 
   setResults("Procesando...");
 
@@ -189,7 +189,7 @@ document.getElementById("process-btn").addEventListener("click", async () => {
     const res = await fetchApi("/process", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ max_nodos: maxNodes, nodos: nodosObj })
+      body: JSON.stringify({ nodes: nodesPayload })
     });
     const data = await res.json();
 

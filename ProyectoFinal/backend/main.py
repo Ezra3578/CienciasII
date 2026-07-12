@@ -27,20 +27,24 @@ el bloque MODO DEMO al final del archivo):
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from pathlib import Path
 from pydantic import BaseModel
 from typing import List
 
 from shapely.geometry import MultiPoint
+from starlette.staticfiles import StaticFiles
 
 import graph_service
 from graph_adapter import GrafoLogico
 from Dijkstra import Dijkstra
 
 app = FastAPI()
+FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origin_regex=r"https://.*\.app\.github\.dev",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -49,13 +53,18 @@ app.add_middleware(
 
 class Node(BaseModel):
     name: str
-    type: str          # "depot" o "delivery"
+    type: str          # "depot" o "deploy" (también acepta "delivery" por compatibilidad)
     longitude: float
     latitude: float
 
 
 class RequestData(BaseModel):
     nodes: List[Node]
+
+
+@app.get("/")
+def serve_index():
+    return FileResponse(FRONTEND_DIR / "index.html")
 
 
 @app.on_event("startup")
@@ -130,8 +139,9 @@ def get_graph_data():
 
 @app.post("/process")
 async def process_data(data: RequestData):
+    print(f"Recibidos {len(data.nodes)} nodos: {[n.name for n in data.nodes]}")
     depots = [n for n in data.nodes if n.type == "depot"]
-    deliveries = [n for n in data.nodes if n.type == "delivery"]
+    deliveries = [n for n in data.nodes if n.type in {"deploy", "delivery"}]
 
     if not depots:
         raise HTTPException(400, "Se necesita al menos un nodo tipo 'depot'.")
@@ -199,6 +209,9 @@ async def process_data(data: RequestData):
         "routes": routes,
         "sin_asignar": sin_asignar,
     }
+
+
+app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
 
 
 # ======================================================================

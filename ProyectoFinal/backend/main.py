@@ -38,6 +38,7 @@ from starlette.staticfiles import StaticFiles
 import graph_service
 from graph_adapter import GrafoLogico
 from Dijkstra import Dijkstra
+from FloydWarshall import FloydWarshall
 
 app = FastAPI()
 FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
@@ -159,7 +160,12 @@ async def process_data(data: RequestData):
         [d.name for d in depots], [e.name for e in deliveries]
     )
 
+
     asignacion, sin_asignar = _asignar_depot_mas_cercano(grafo, depots, deliveries)
+
+    #Aquí se ejecuta el algoritmo de Floyd Warshall (no toqué lo del Dijkstra por si acaso xD)
+    fw = FloydWarshall(grafo)
+    fw.calcularTodasLasDistancias()
 
     dijkstra = Dijkstra(grafo)
     regiones = {}
@@ -183,6 +189,11 @@ async def process_data(data: RequestData):
         ruta = []
         for nombre_entrega in entregas_asignadas:
             camino_logico = dijkstra.getCaminoLista(depot.name, nombre_entrega)
+
+            #Esta línea está como prueba para obtener el camino que daría el Floyd Warshall xD
+            # camino_logico = fw.getCaminoLista(depot.name, 
+            #                                   nombre_entrega)
+
             if not camino_logico:
                 continue
 
@@ -380,36 +391,130 @@ def _demo_exportar_json(grafo: GrafoLogico, ruta_salida: str = "grafo_demo.json"
 
 
 def _demo():
-    grafo = GrafoLogico()
+    ############################################################################### Ejemplo Dijkstra Daniel xD
+    # grafo = GrafoLogico()
+    
+    # grafo.agregarNodo("Bodega_Central", lat=60.1673, lon=24.9308, role="depot")
+    # grafo.agregarNodo("Cliente_1", lat=60.1660, lon=24.9330, role="deploy")
+    # grafo.agregarNodo("Cliente_2", lat=60.1690, lon=24.9280, role="deploy")
 
-    grafo.agregarNodo("Bodega_Central", lat=60.1673, lon=24.9308, role="depot")
-    grafo.agregarNodo("Cliente_1", lat=60.1660, lon=24.9330, role="deploy")
-    grafo.agregarNodo("Cliente_2", lat=60.1690, lon=24.9280, role="deploy")
+    # grafo.conectar_depots_con_entregas(["Bodega_Central"], ["Cliente_1", "Cliente_2"])
 
-    grafo.conectar_depots_con_entregas(["Bodega_Central"], ["Cliente_1", "Cliente_2"])
+    # dijkstra = Dijkstra(grafo)
 
-    dijkstra = Dijkstra(grafo)
+    # punto_despacho = "Bodega_Central"
+    # punto_entrega = "Cliente_2"
 
-    punto_despacho = "Bodega_Central"
-    punto_entrega = "Cliente_2"
-
-    print(dijkstra.getDistancia(punto_despacho, punto_entrega))
-    print(dijkstra.getCamino(punto_despacho, punto_entrega))
-    print(f"Pasos realizados por el algoritmo: {dijkstra.getPasos()}")
+    # print(dijkstra.getDistancia(punto_despacho, punto_entrega))
+    # print(dijkstra.getCamino(punto_despacho, punto_entrega))
+    # print(f"Pasos realizados por el algoritmo: {dijkstra.getPasos()}")
 
     
-    camino = dijkstra.getCaminoLista(punto_despacho, punto_entrega)
-    if camino:
-        _demo_dibujar_camino(
-            grafo, camino,
-            titulo=f"Ruta más corta: {punto_despacho} -> {punto_entrega}",
-            guardar_como="ruta_dijkstra.png",
-        )
-    else:
-        print("No se encontró un camino para graficar.")
+    # camino = dijkstra.getCaminoLista(punto_despacho, punto_entrega)
+    # if camino:
+    #     _demo_dibujar_camino(
+    #         grafo, camino,
+    #         titulo=f"Ruta más corta: {punto_despacho} -> {punto_entrega}",
+    #         guardar_como="ruta_dijkstra.png",
+    #     )
+    # else:
+    #     print("No se encontró un camino para graficar.")
 
-    #Exporta el json con la información del grafo completo y los nodos de interés de la demo
-    _demo_exportar_json(grafo)
+    # #Exporta el json con la información del grafo completo y los nodos de interés de la demo
+    # _demo_exportar_json(grafo)
+    ############################################################################### Ejemplo Dijkstra Daniel xD
+
+    ############################################################################### Prueba Floyd Warshall
+    grafo = construir_grafo_floyd()
+
+    fw = FloydWarshall(grafo)
+    fw.calcularTodasLasDistancias()
+
+    print("=== MATRIZ DE DISTANCIAS ===")
+    imprimir_matriz(fw)
+
+def imprimir_matriz(fw):
+    matriz = fw.getMatrizDistancias()
+    nodos = fw.nodos
+
+    ancho = max(len(n) for n in nodos) + 2
+
+    encabezado = " " * ancho
+    encabezado += "".join(f"{n:>{ancho}}" for n in nodos)
+
+    print(encabezado)
+
+    for origen in nodos:
+        fila = f"{origen:<{ancho}}"
+
+        for destino in nodos:
+            distancia = matriz[origen][destino]
+
+            if distancia == float("inf"):
+                valor = "inf"
+            else:
+                valor = f"{distancia:.1f}"
+
+            fila += f"{valor:>{ancho}}"
+
+        print(fila)
+
+def construir_grafo_floyd():
+    grafo = GrafoLogico()
+
+    # Bodegas
+    grafo.agregarNodo("Bodega_Central", lat=60.1673, lon=24.9308, role="depot")
+    grafo.agregarNodo("Bodega_Norte", lat=60.1710, lon=24.9265, role="depot")
+
+    # Clientes
+    grafo.agregarNodo("Cliente_1", lat=60.1660, lon=24.9330, role="deploy")
+    grafo.agregarNodo("Cliente_2", lat=60.1690, lon=24.9280, role="deploy")
+    grafo.agregarNodo("Cliente_3", lat=60.1685, lon=24.9355, role="deploy")
+    grafo.agregarNodo("Cliente_4", lat=60.1705, lon=24.9310, role="deploy")
+    grafo.agregarNodo("Cliente_5", lat=60.1655, lon=24.9275, role="deploy")
+    grafo.agregarNodo("Cliente_6", lat=60.1725, lon=24.9340, role="deploy")
+    grafo.agregarNodo("Cliente_7", lat=60.1678, lon=24.9250, role="deploy")
+    grafo.agregarNodo("Cliente_8", lat=60.1718, lon=24.9298, role="deploy")
+
+    # Conectar bodegas con clientes
+    grafo.conectar_depots_con_entregas(
+        ["Bodega_Central", "Bodega_Norte"],
+        [
+            "Cliente_1",
+            "Cliente_2",
+            "Cliente_3",
+            "Cliente_4",
+            "Cliente_5",
+            "Cliente_6",
+            "Cliente_7",
+            "Cliente_8"
+        ]
+    )
+
+    # Conexiones adicionales entre clientes
+    conexiones = [
+        ("Cliente_1", "Cliente_2"),
+        ("Cliente_2", "Cliente_3"),
+        ("Cliente_3", "Cliente_4"),
+        ("Cliente_4", "Cliente_5"),
+        ("Cliente_5", "Cliente_6"),
+        ("Cliente_6", "Cliente_7"),
+        ("Cliente_7", "Cliente_8"),
+
+        ("Cliente_1", "Cliente_5"),
+        ("Cliente_2", "Cliente_6"),
+        ("Cliente_3", "Cliente_7"),
+        ("Cliente_4", "Cliente_8"),
+
+        ("Cliente_2", "Cliente_5"),
+        ("Cliente_5", "Cliente_8"),
+        ("Cliente_1", "Cliente_4"),
+    ]
+
+    for origen, destino in conexiones:
+        grafo.agregarAristaAutomatica(origen, destino, bidireccional=True)
+
+    return grafo
 
 if __name__ == "__main__":
     import sys

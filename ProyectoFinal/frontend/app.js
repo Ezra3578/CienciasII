@@ -197,30 +197,34 @@ document.getElementById("process-btn").addEventListener("click", async () => {
       setResults("El servidor aún está en fase de desarrollo (respuesta 'en trabajo').");
     }
 
-    // Dibujar convex hulls si existen
     hullsLayer.clearLayers();
-    if (data.convex_hulls) {
-      drawConvexHulls(data.convex_hulls);
-    }
-
-    // Dibujar rutas si existen
     routesLayer.clearLayers();
-    if (data.routes) {
-      drawRoutes(data.routes);
-    }
+
+    drawConvexHulls(data);
+    drawRoutes(data);
 
   } catch (err) {
     setResults(`Error: ${err.message}`);
   }
 });
 
-function drawConvexHulls(hulls) {
-  // hulls: { "1": { "A": [lon, lat], "1": [lon, lat], ... }, "2": {...} }
-  Object.entries(hulls).forEach(([regionId, points]) => {
-    const coords = Object.values(points).map(([lon, lat]) => [lat, lon]);
+function drawConvexHulls(regions) {
+  Object.entries(regions).forEach(([regionId, regionData]) => {
+    const points = Array.isArray(regionData?.frontera) ? regionData.frontera : [];
+    const coords = points
+      .map(point => {
+        if (point && typeof point === "object") {
+          if (typeof point.latitud === "number" && typeof point.longitud === "number") {
+            return [point.latitud, point.longitud];
+          }
+        }
+        return null;
+      })
+      .filter(Boolean);
+
     if (coords.length > 2) {
       L.polygon(coords, {
-        color: ZONE_COLORS[(parseInt(regionId)-1) % ZONE_COLORS.length],
+        color: ZONE_COLORS[(parseInt(regionId, 10) - 1) % ZONE_COLORS.length],
         fillOpacity: 0.2,
         weight: 2
       }).addTo(hullsLayer).bindPopup(`Región ${regionId}`);
@@ -228,22 +232,26 @@ function drawConvexHulls(hulls) {
   });
 }
 
-function drawRoutes(routes) {
-  // routes: { "1": { "id_region": 1, "route": ["A", "1", "3", "A"] }, ... }
-  // Se necesita buscar coordenadas por nombre
-  const nameToCoord = {};
-  [...depots, ...deliveries].forEach(node => {
-    nameToCoord[node.name] = [node.lat, node.lng];
-  });
+function drawRoutes(regions) {
+  Object.entries(regions).forEach(([routeId, regionData]) => {
+    const routePoints = Array.isArray(regionData?.ruta) ? regionData.ruta : [];
+    const latlngs = routePoints
+      .map(point => {
+        if (point && typeof point === "object") {
+          if (typeof point.latitud === "number" && typeof point.longitud === "number") {
+            return [point.latitud, point.longitud];
+          }
+        }
+        return null;
+      })
+      .filter(Boolean);
 
-  Object.entries(routes).forEach(([routeId, info]) => {
-    const latlngs = info.route.map(name => nameToCoord[name]).filter(Boolean);
     if (latlngs.length > 1) {
       L.polyline(latlngs, {
-        color: ZONE_COLORS[(parseInt(info.id_region)-1) % ZONE_COLORS.length],
+        color: ZONE_COLORS[(parseInt(routeId, 10) - 1) % ZONE_COLORS.length],
         weight: 4,
         opacity: 0.8
-      }).addTo(routesLayer).bindPopup(`Ruta ${routeId} (Región ${info.id_region})`);
+      }).addTo(routesLayer).bindPopup(`Ruta ${routeId}`);
     }
   });
 }

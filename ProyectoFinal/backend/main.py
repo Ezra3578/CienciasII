@@ -137,7 +137,91 @@ def get_graph_data():
     return graph_service.graph_to_json(G)
 
 
-@app.post("/process")
+@app.post("/process") #MODIFICADO POR ANA PARA REVISAR QUE SI GRAFIQUE EL FRONT
+async def process_data(data: RequestData):
+    print(f"Recibidos {len(data.nodes)} nodos: {[n.name for n in data.nodes]}")
+    depots = [n for n in data.nodes if n.type == "depot"]
+    deliveries = [n for n in data.nodes if n.type in {"deploy", "delivery"}]
+
+    if not depots:
+        raise HTTPException(400, "Se necesita al menos un nodo tipo 'depot'.")
+
+    # Grafo de negocio (temporal, solo para este request) sobre la red
+    # vial compartida de Kamppi, Helsinki.
+    grafo = GrafoLogico()
+
+    for depot in depots:
+        grafo.agregarNodo(depot.name, depot.latitude, depot.longitude, role="depot")
+    for entrega in deliveries:
+        grafo.agregarNodo(entrega.name, entrega.latitude, entrega.longitude, role="deploy")
+
+    grafo.conectar_depots_con_entregas(
+        [d.name for d in depots], [e.name for e in deliveries]
+    )
+
+    asignacion, sin_asignar = _asignar_depot_mas_cercano(grafo, depots, deliveries)
+
+    dijkstra = Dijkstra(grafo)
+    regiones = {}
+
+    for index, depot in enumerate(depots, start=1):
+        entregas_asignadas = asignacion[depot.name]
+
+        # --- frontera de esta zona (depot + sus entregas) ---
+        puntos_zona = [depot.name] + entregas_asignadas
+        hull_puntos = _convex_hull(grafo, puntos_zona)
+        frontera = []
+        for i, punto in enumerate(hull_puntos):
+            nombre = puntos_zona[i % len(puntos_zona)] if puntos_zona else f"p{i + 1}"
+            frontera.append({
+                "nombre": nombre,
+                "longitud": punto["lng"],
+                "latitud": punto["lat"],
+            })
+
+        # --- ruta de esta zona: puntos del camino lógico de cada entrega ---
+        ruta = []
+        for nombre_entrega in entregas_asignadas:
+            camino_logico = dijkstra.getCaminoLista(depot.name, nombre_entrega)
+            if not camino_logico:
+                continue
+
+            for nombre_nodo in camino_logico:
+                if nombre_nodo not in grafo.coordenadas:
+                    continue
+                lat, lon = grafo.coordenadas[nombre_nodo]
+                ruta.append({
+                    "nombre": nombre_nodo,
+                    "longitud": lon,
+                    "latitud": lat,
+                })
+
+        # Evita duplicar coordenadas consecutivas
+        ruta_unica = []
+        vistos = set()
+        for punto in ruta:
+            clave = (punto["latitud"], punto["longitud"])
+            if clave in vistos:
+                continue
+            vistos.add(clave)
+            ruta_unica.append(punto)
+
+        if not ruta_unica and puntos_zona:
+            lat, lon = grafo.coordenadas[depot.name]
+            ruta_unica.append({
+                "nombre": depot.name,
+                "longitud": lon,
+                "latitud": lat,
+            })
+
+        regiones[str(index)] = {
+            "frontera": frontera,
+            "ruta": ruta_unica,
+        }
+
+    return regiones
+
+"""@app.post("/process") #VERSIÓN QUE HABÍA HECHO DANIEL
 async def process_data(data: RequestData):
     print(f"Recibidos {len(data.nodes)} nodos: {[n.name for n in data.nodes]}")
     depots = [n for n in data.nodes if n.type == "depot"]
@@ -208,8 +292,7 @@ async def process_data(data: RequestData):
         "convex_hulls": convex_hulls,
         "routes": routes,
         "sin_asignar": sin_asignar,
-    }
-
+    }"""
 
 app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
 

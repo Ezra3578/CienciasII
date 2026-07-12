@@ -38,7 +38,7 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 
 // Datos
 let depots = [];          // { name, lat, lng, type: "depot" }
-let deliveries = [];      // { name, lat, lng, type: "delivery" }
+let deliveries = [];      // { name, lat, lng, type: "deploy" }
 
 // Capas
 let markersLayer = L.layerGroup().addTo(map);
@@ -157,7 +157,7 @@ map.on("click", (e) => {
     depots.push({ name, lat, lng, type: "depot" });
   } else {
     const name = getNextDeliveryNumber();
-    deliveries.push({ name, lat, lng, type: "delivery" });
+    deliveries.push({ name, lat, lng, type: "deploy" });
   }
   redrawPoints();
 });

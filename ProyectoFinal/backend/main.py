@@ -217,7 +217,7 @@ async def process_data(data: RequestData):
     return regiones
 
     # dijkstra = Dijkstra(grafo)
-    regiones = {}
+    """regiones = {}
 
     for index, depot in enumerate(depots, start=1):
         entregas_asignadas = asignacion[depot.name]
@@ -276,9 +276,8 @@ async def process_data(data: RequestData):
             "frontera": frontera,
             "ruta": ruta_unica,
         }
-
     return regiones
-
+"""
 """@app.post("/process") #VERSIÓN QUE HABÍA HECHO DANIEL
 async def process_data(data: RequestData):
     print(f"Recibidos {len(data.nodes)} nodos: {[n.name for n in data.nodes]}")

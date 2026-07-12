@@ -167,7 +167,7 @@ async def process_data(data: RequestData):
     fw = FloydWarshall(grafo)
     fw.calcularTodasLasDistancias()
 
-    dijkstra = Dijkstra(grafo)
+    # dijkstra = Dijkstra(grafo)
     regiones = {}
 
     for index, depot in enumerate(depots, start=1):
@@ -188,11 +188,9 @@ async def process_data(data: RequestData):
         # --- ruta de esta zona: puntos del camino lógico de cada entrega ---
         ruta = []
         for nombre_entrega in entregas_asignadas:
-            camino_logico = dijkstra.getCaminoLista(depot.name, nombre_entrega)
+            # camino_logico = dijkstra.getCaminoLista(depot.name, nombre_entrega)
 
-            #Esta línea está como prueba para obtener el camino que daría el Floyd Warshall xD
-            # camino_logico = fw.getCaminoLista(depot.name, 
-            #                                   nombre_entrega)
+            camino_logico = fw.getCaminoLista(depot.name, nombre_entrega)
 
             if not camino_logico:
                 continue

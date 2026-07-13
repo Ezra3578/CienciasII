@@ -257,12 +257,28 @@ function drawRoutes(regions) {
       .filter(Boolean);
 
     if (latlngs.length > 1) {
-      L.polyline(latlngs, {
-        color: getZoneColor(routeId),
+      const zoneColor = getZoneColor(routeId);
+
+      const routeLine = L.polyline(latlngs, {
+        color: zoneColor,
         weight: 2,
         opacity: 0.8,
         dashArray: 10
       }).addTo(routesLayer).bindPopup(`Ruta ${routeId}`);
+
+      L.polylineDecorator(routeLine, {
+        patterns: [
+          {
+            offset: '5%',
+            repeat: '10%',
+            symbol: L.Symbol.arrowHead({
+              pixelSize: 10,
+              polygon: false,
+              pathOptions: { stroke: true, color: zoneColor, weight: 2 }
+            })
+          }
+        ]
+      }).addTo(routesLayer);
     }
   });
 }

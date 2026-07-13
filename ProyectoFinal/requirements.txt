@@ -4,3 +4,5 @@ osmnx==2.1.0
 networkx
 python-tsp
 scikit-learn
+numpy
+scipy

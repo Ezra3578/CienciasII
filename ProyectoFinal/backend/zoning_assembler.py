@@ -13,7 +13,7 @@ no un id inventado como "id_región1".
 from typing import Dict, List, Set, Tuple
 
 from graph_adapter import GrafoLogico
-from schemas_zonas import NodoCoord, ZonaResponse, ProcessResponse
+from schemas_zonas import NodoCoord, regionData, ProcessResponse
 
 
 def construir_ruta_zona(
@@ -110,14 +110,14 @@ def construir_respuesta(
 
     Retorna
     -------
-    ProcessResponse (Dict[str, ZonaResponse])
+    ProcessResponse (Dict[str, regionData])
         Diccionario donde la llave es el nombre del depot y el valor
-        es un ZonaResponse con frontera y ruta.
+        es un regionData con frontera y ruta.
     """
 
     respuesta: ProcessResponse = {}
 
-    for nombre_depot in lista_depots:
+    for indice, nombre_depot in enumerate(lista_depots, start=1):
         # Obtener todos los nodos asignados a este depot
         nodos_de_esta_zona: set[str] = {
             nombre_nodo
@@ -130,8 +130,10 @@ def construir_respuesta(
             grafo_mst, nodos_de_esta_zona, nombre_depot
         )
 
-        # Ensamblar el ZonaResponse con coordenadas reales
-        respuesta[nombre_depot] = ZonaResponse(
+        # Ensamblar el regionData con coordenadas reales
+        # La clave de la zona se representa con un identificador numérico
+        # secuencial, que el frontend puede leer fácilmente.
+        respuesta[str(indice)] = regionData(
             frontera=[
                 NodoCoord(
                     nombre=nombre_nodo,

@@ -20,7 +20,7 @@ async function fetchApi(path, options = {}) {
 // Paleta de colores para las zonas (opcional para futuras visualizaciones)
 const ZONE_COLORS = [
   "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231",
-  "#911eb4", "#46f0f0", "#f032e6", "#bcf60c", "#fabebe",
+  "#911eb4", "#46f0f0", "#f032e6", "#bcf60c", "#00ca83",
 ];
 
 function getZoneColor(zoneId) {
@@ -236,7 +236,7 @@ function drawConvexHulls(regions) {
       L.polygon(coords, {
         color: getZoneColor(regionId),
         fillOpacity: 0.2,
-        weight: 2
+        weight: 3
       }).addTo(hullsLayer).bindPopup(`Región ${regionId}`);
     }
   });
@@ -259,8 +259,9 @@ function drawRoutes(regions) {
     if (latlngs.length > 1) {
       L.polyline(latlngs, {
         color: getZoneColor(routeId),
-        weight: 4,
-        opacity: 0.8
+        weight: 2,
+        opacity: 0.8,
+        dashArray: 10
       }).addTo(routesLayer).bindPopup(`Ruta ${routeId}`);
     }
   });

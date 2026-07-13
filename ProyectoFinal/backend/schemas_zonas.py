@@ -23,7 +23,7 @@ class NodoCoord(BaseModel):
     latitud: float
 
 
-class ZonaResponse(BaseModel):
+class regionData(BaseModel):
     """
     Respuesta de una zona individual:
       - frontera: nodos que delimitan el borde de la zona
@@ -35,4 +35,4 @@ class ZonaResponse(BaseModel):
 
 # FastAPI acepta un Dict como response_model directamente,
 # no necesitamos envolverlo en otro BaseModel con __root__.
-ProcessResponse = Dict[str, ZonaResponse]
+ProcessResponse = Dict[str, regionData]

@@ -20,8 +20,19 @@ async function fetchApi(path, options = {}) {
 // Paleta de colores para las zonas (opcional para futuras visualizaciones)
 const ZONE_COLORS = [
   "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231",
-  "#911eb4", "#46f0f0", "#f032e6", "#bcf60c", "#fabebe",
+  "#911eb4", "#46f0f0", "#f032e6", "#bcf60c", "#00ca83",
 ];
+
+function getZoneColor(zoneId) {
+  const text = String(zoneId ?? "");
+  let hash = 0;
+
+  for (let i = 0; i < text.length; i += 1) {
+    hash = (hash * 31 + text.charCodeAt(i)) >>> 0;
+  }
+
+  return ZONE_COLORS[hash % ZONE_COLORS.length];
+}
 
 // Límites de Kamppi, Helsinki (aprox.)
 const KAMPPI_BOUNDS = [
@@ -193,15 +204,14 @@ document.getElementById("process-btn").addEventListener("click", async () => {
     });
     const data = await res.json();
 
-    if (data.status === "en trabajo") {
-      setResults("El servidor aún está en fase de desarrollo (respuesta 'en trabajo').");
-    }
-
     hullsLayer.clearLayers();
     routesLayer.clearLayers();
 
     drawConvexHulls(data);
     drawRoutes(data);
+
+    const regionCount = Object.keys(data || {}).length;
+    setResults(`Procesamiento completado. Se dibujaron ${regionCount} zonas.`);
 
   } catch (err) {
     setResults(`Error: ${err.message}`);
@@ -224,9 +234,9 @@ function drawConvexHulls(regions) {
 
     if (coords.length > 2) {
       L.polygon(coords, {
-        color: ZONE_COLORS[(parseInt(regionId, 10) - 1) % ZONE_COLORS.length],
+        color: getZoneColor(regionId),
         fillOpacity: 0.2,
-        weight: 2
+        weight: 3
       }).addTo(hullsLayer).bindPopup(`Región ${regionId}`);
     }
   });
@@ -248,9 +258,10 @@ function drawRoutes(regions) {
 
     if (latlngs.length > 1) {
       L.polyline(latlngs, {
-        color: ZONE_COLORS[(parseInt(routeId, 10) - 1) % ZONE_COLORS.length],
-        weight: 4,
-        opacity: 0.8
+        color: getZoneColor(routeId),
+        weight: 2,
+        opacity: 0.8,
+        dashArray: 10
       }).addTo(routesLayer).bindPopup(`Ruta ${routeId}`);
     }
   });

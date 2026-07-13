@@ -365,14 +365,17 @@ from zoning_assembler import construir_respuesta
 @app.post("/process", response_model=ProcessResponse)
 async def process_data_mst_bfs(datos: RequestData):
      """
-     Endpoint alternativo que usa MST + BFS multi-fuente para zonificar.
+     Endpoint que usa zonificación por k-medoids, luego construye un MST
+     por cada matriz de zona y, finalmente, aplica BFS sobre cada árbol
+     para asignar los nodos a su depot de zona.
 
      Pasos:
        1. Recepción del request y construcción del grafo lógico.
-       2. Floyd-Warshall sobre el grafo lógico.
-       3. Árbol de Recubrimiento Mínimo sobre la matriz de distancias.
-       4. BFS multi-fuente sobre el MST para asignar zonas.
-       5. Ensamblado y respuesta final.
+       2. Floyd-Warshall sobre el grafo lógico para obtener distancias.
+       3. Zonificación con k-medoids, que devuelve una matriz por zona.
+       4. Árbol de Recubrimiento Mínimo sobre cada matriz de zona.
+       5. BFS sobre cada MST para asignar nodos a su depot de zona.
+       6. Ensamblado y respuesta final.
      """
 
      # ---- Paso 1: Recepción del request y construcción del grafo ----
@@ -419,39 +422,99 @@ async def process_data_mst_bfs(datos: RequestData):
 
      # ---- Paso 2: Floyd-Warshall ----
      # Se calcula la distancia más corta entre todo par de nodos lógicos.
+     # Esta matriz se usa como base para la zonificación posterior.
      floyd_warshall = FloydWarshall(grafo_logico)
      floyd_warshall.calcularTodasLasDistancias()
-     matriz_distancias = floyd_warshall.getMatrizDistancias()
 
-     # ---- Paso 3: Árbol de Recubrimiento Mínimo ----
-     # Sobre la matriz de distancias se construye el MST (Prim),
-     # obteniendo un GrafoLogico con solo las aristas del árbol.
-     grafo_mst = construir_mst(matriz_distancias, grafo_logico)
-
-     # ---- Paso 4: BFS multi-fuente ----
-     # Se recorre el MST desde todos los depots al mismo tiempo,
-     # asignando cada nodo a la zona de su depot más cercano (en hops),
-     # respetando el cupo máximo de nodos por zona.
-     zona_por_nodo, frontera_por_depot = bfs_multifuente(
-         grafo_mst, nombres_depots, datos.max_nodos_por_zona
+     # ---- Paso 3: Zonificación por matriz de zona ----
+     # Se invoca a zonificar para obtener, por cada zona, una matriz local
+     # con las distancias entre sus nodos y el depot asignado a esa zona.
+     matrices_zona, resumen_zonas = zonificar(
+         floyd_warshall,
+         nombres_depots,
+         nombres_deliveries,
+         datos.max_nodos_por_zona,
      )
 
-     # ---- Paso 5: Ensamblado y respuesta ----
-     # Se construye el dict de coordenadas a partir de datos.nodes
-     # (el body del request), NO del grafo lógico.
+     # ---- Paso 4: MST por cada matriz de zona ----
+     # Para cada zona, se toma su matriz local y se construye un MST que
+     # conecte solo los nodos correspondientes a esa zona.
      coordenadas_nodos = {
          nodo.name: (nodo.latitude, nodo.longitude)
          for nodo in datos.nodes
      }
 
-     # Se arma la respuesta final con el ensamblador
-     respuesta_final = construir_respuesta(
-         zona_por_nodo,
-         frontera_por_depot,
-         grafo_mst,
-         coordenadas_nodos,
-         nombres_depots,
-     )
+     # Se arma una asignación global de nodos a depots para poder calcular
+     # la frontera de cada zona con un convex hull sobre sus nodos asignados.
+     zona_por_nodo_global = {}
+     for zona_info in resumen_zonas:
+         nombre_zona = zona_info["nombre"]
+         depot_zona = zona_info["deposito"]
+         for nombre_nodo in matrices_zona[nombre_zona].keys():
+             zona_por_nodo_global[nombre_nodo] = depot_zona
+
+     # Se calcula la frontera de cada zona utilizando _convex_hull
+    
+     frontera_por_depot = {depot: set() for depot in nombres_depots}
+     for depot in nombres_depots:
+         nodos_de_la_zona = [
+             nombre_nodo
+             for nombre_nodo, depot_asignado in zona_por_nodo_global.items()
+             if depot_asignado == depot
+         ]
+         if not nodos_de_la_zona:
+             continue
+
+         puntos_hull = _convex_hull(grafo_logico, nodos_de_la_zona)
+         punto_a_nombre = {
+             (coordenadas_nodos[nombre_nodo][0], coordenadas_nodos[nombre_nodo][1]): nombre_nodo
+             for nombre_nodo in nodos_de_la_zona
+         }
+
+         for punto in puntos_hull:
+             nombre_nodo = punto_a_nombre.get((punto["lat"], punto["lng"]))
+             if nombre_nodo is not None:
+                 frontera_por_depot[depot].add(nombre_nodo)
+
+     respuesta_final = {}
+     for indice, zona_info in enumerate(resumen_zonas, start=1):
+         nombre_zona = zona_info["nombre"]
+         depot_zona = zona_info["deposito"]
+         matriz_zona = matrices_zona[nombre_zona]
+
+         # Se crea un grafo temporal solo con los nodos de esta zona para
+         # poder construir el MST con coordenadas reales del request actual.
+         grafo_zona = GrafoLogico()
+         for nombre_nodo in matriz_zona.keys():
+             latitud, longitud = grafo_logico.coordenadas[nombre_nodo]
+             rol_nodo = grafo_logico.roles.get(nombre_nodo, "normal")
+             grafo_zona.agregarNodo(nombre_nodo, latitud, longitud, role=rol_nodo)
+
+         # Se construye el MST sobre la matriz de esta zona concreta.
+         grafo_mst_zona = construir_mst(matriz_zona, grafo_zona)
+
+         # ---- Paso 5: BFS sobre cada MST de zona ----
+         # Se aplica BFS desde el depot de esta zona sobre su árbol para
+         # asignar los nodos restantes a ese depot y formar la región.
+         zona_por_nodo, _ = bfs_multifuente(
+             grafo_mst_zona,
+             [depot_zona],
+             datos.max_nodos_por_zona,
+         )
+
+         # ---- Paso 6: Ensamblado y respuesta final ----
+         # Se reutiliza el ensamblador para devolver la estructura esperada
+         # con frontera y ruta para cada región.
+         respuesta_parcial = construir_respuesta(
+             {nodo: depot_zona for nodo in zona_por_nodo.keys()},
+             {depot_zona: frontera_por_depot.get(depot_zona, set())},
+             grafo_mst_zona,
+             coordenadas_nodos,
+             [depot_zona],
+         )
+
+         if respuesta_parcial:
+             respuesta_final[str(indice)] = respuesta_parcial["1"]
 
      return respuesta_final
 

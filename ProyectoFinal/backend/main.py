@@ -351,6 +351,111 @@ async def process_data(data: RequestData):
         "sin_asignar": sin_asignar,
     }"""
 
+# ==========================================================================
+# NUEVO ENDPOINT /process — MST + BFS multi-fuente
+# ==========================================================================
+# Para activarlo: descomentar todo el bloque de abajo (imports + endpoint)
+# y comentar el @app.post("/process") viejo que está arriba.
+#
+# from arbol_recubrimiento_minimo import construir_mst
+# from bfs_multifuente import bfs_multifuente
+# from schemas_zonas import ProcessResponse
+# from zoning_assembler import construir_respuesta
+#
+#
+# @app.post("/process_mst_bfs", response_model=ProcessResponse)
+# async def process_data_mst_bfs(datos: RequestData):
+#     """
+#     Endpoint alternativo que usa MST + BFS multi-fuente para zonificar.
+#
+#     Pasos:
+#       1. Recepción del request y construcción del grafo lógico.
+#       2. Floyd-Warshall sobre el grafo lógico.
+#       3. Árbol de Recubrimiento Mínimo sobre la matriz de distancias.
+#       4. BFS multi-fuente sobre el MST para asignar zonas.
+#       5. Ensamblado y respuesta final.
+#     """
+#
+#     # ---- Paso 1: Recepción del request y construcción del grafo ----
+#     # Se crea un GrafoLogico vacío y se puebla con los nodos del body.
+#     # Después se conectan las aristas depot↔delivery con distancia real.
+#     grafo_logico = GrafoLogico()
+#
+#     # Separar nodos por tipo
+#     nodos_depot = [nodo for nodo in datos.nodes if nodo.type == "depot"]
+#     nodos_delivery = [
+#         nodo for nodo in datos.nodes
+#         if nodo.type in {"deploy", "delivery"}
+#     ]
+#
+#     if not nodos_depot:
+#         raise HTTPException(400, "Se necesita al menos un nodo tipo 'depot'.")
+#
+#     # Agregar cada nodo al grafo lógico con sus coordenadas y rol
+#     for nodo in nodos_depot:
+#         grafo_logico.agregarNodo(
+#             nodo.name, nodo.latitude, nodo.longitude, role="depot"
+#         )
+#     for nodo in nodos_delivery:
+#         grafo_logico.agregarNodo(
+#             nodo.name, nodo.latitude, nodo.longitude, role="deploy"
+#         )
+#
+#     # Conectar cada depot con cada delivery (grafo bipartito) usando
+#     # distancia real por la red vial. También se conectan deliveries
+#     # entre sí para que Floyd-Warshall tenga caminos entre todos.
+#     nombres_depots = [nodo.name for nodo in nodos_depot]
+#     nombres_deliveries = [nodo.name for nodo in nodos_delivery]
+#     grafo_logico.conectar_depots_con_entregas(nombres_depots, nombres_deliveries)
+#
+#     # Conectar deliveries entre sí (todas las combinaciones) para que
+#     # la matriz de Floyd-Warshall tenga distancias entre todos los pares
+#     for indice_i in range(len(nombres_deliveries)):
+#         for indice_j in range(indice_i + 1, len(nombres_deliveries)):
+#             grafo_logico.agregarAristaAutomatica(
+#                 nombres_deliveries[indice_i],
+#                 nombres_deliveries[indice_j],
+#                 bidireccional=True,
+#             )
+#
+#     # ---- Paso 2: Floyd-Warshall ----
+#     # Se calcula la distancia más corta entre todo par de nodos lógicos.
+#     floyd_warshall = FloydWarshall(grafo_logico)
+#     floyd_warshall.calcularTodasLasDistancias()
+#     matriz_distancias = floyd_warshall.getMatrizDistancias()
+#
+#     # ---- Paso 3: Árbol de Recubrimiento Mínimo ----
+#     # Sobre la matriz de distancias se construye el MST (Prim),
+#     # obteniendo un GrafoLogico con solo las aristas del árbol.
+#     grafo_mst = construir_mst(matriz_distancias, grafo_logico)
+#
+#     # ---- Paso 4: BFS multi-fuente ----
+#     # Se recorre el MST desde todos los depots al mismo tiempo,
+#     # asignando cada nodo a la zona de su depot más cercano (en hops),
+#     # respetando el cupo máximo de nodos por zona.
+#     zona_por_nodo, frontera_por_depot = bfs_multifuente(
+#         grafo_mst, nombres_depots, datos.max_nodos_por_zona
+#     )
+#
+#     # ---- Paso 5: Ensamblado y respuesta ----
+#     # Se construye el dict de coordenadas a partir de datos.nodes
+#     # (el body del request), NO del grafo lógico.
+#     coordenadas_nodos = {
+#         nodo.name: (nodo.latitude, nodo.longitude)
+#         for nodo in datos.nodes
+#     }
+#
+#     # Se arma la respuesta final con el ensamblador
+#     respuesta_final = construir_respuesta(
+#         zona_por_nodo,
+#         frontera_por_depot,
+#         grafo_mst,
+#         coordenadas_nodos,
+#         nombres_depots,
+#     )
+#
+#     return respuesta_final
+
 app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
 
 

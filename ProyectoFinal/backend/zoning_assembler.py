@@ -9,12 +9,40 @@ diccionario tipado ProcessResponse que se envía al frontend.
 La llave de cada entrada es el nombre del depot (e.g. "A", "Bodega_Central"),
 no un id inventado como "id_región1".
 """
-
+import logging
+from pathlib import Path
 from typing import Dict, List, Set, Tuple
 
 from graph_adapter import GrafoLogico
 from schemas_zonas import NodoCoord, regionData, ProcessResponse
-
+#direccion del log
+LOG_DIR = Path(__file__).resolve().parent / "logs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+LOG_FILE = LOG_DIR / "zoning_assembler.log"
+ 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+#asegurarnos solo un handler
+_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+ 
+if not any(
+    isinstance(h, logging.FileHandler) and Path(h.baseFilename) == LOG_FILE
+    for h in logger.handlers
+):
+    _file_handler = logging.FileHandler(LOG_FILE, encoding="utf-8")
+    _file_handler.setFormatter(_formatter)
+    logger.addHandler(_file_handler)
+ 
+# Handler adicional para que los mensajes también salgan por consola.
+if not any(
+    isinstance(h, logging.StreamHandler) and not isinstance(h, logging.FileHandler)
+    for h in logger.handlers
+):
+    _console_handler = logging.StreamHandler()
+    _console_handler.setFormatter(_formatter)
+    logger.addHandler(_console_handler)
+ 
+logger.propagate = False
 
 def construir_ruta_zona(
     grafo_mst: GrafoLogico,
@@ -125,7 +153,7 @@ def construir_respuesta(
 
     respuesta: ProcessResponse = {}
     distancia_total_km: float = 0.0
-    print("=== NODOS Y KILOMETROS POR ZONA ===")
+    logger.info("=== NODOS Y KILOMETROS POR ZONA ===")
     for indice, nombre_depot in enumerate(lista_depots, start=1):
         # Obtener todos los nodos asignados a este depot
         nodos_de_esta_zona: set[str] = {
@@ -141,9 +169,11 @@ def construir_respuesta(
         #imprimir en kilometros y nodos
         distancia_km = distancia_metros / 1000
         distancia_total_km += distancia_km
-        print(
-            f"Zona '{nombre_depot}': {len(nodos_de_esta_zona)} nodos, "
-            f"{distancia_km:.2f} km recorridos"
+        logger.info(
+            "Zona '%s': %d nodos, %.2f km recorridos",
+            nombre_depot,
+            len(nodos_de_esta_zona),
+            distancia_km,
         )
         # Ensamblar el regionData con coordenadas reales
         # La clave de la zona se representa con un identificador numérico
@@ -166,5 +196,8 @@ def construir_respuesta(
                 for nombre_nodo in orden_ruta
             ],
         )
-    print(f"=== TOTAL: {distancia_total_km:.2f} km recorridos en todas las zonas ===\n")
+    logger.info(
+        "=== TOTAL: %.2f km recorridos en todas las zonas ===",
+        distancia_total_km,
+    )
     return respuesta

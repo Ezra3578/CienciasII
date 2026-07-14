@@ -83,9 +83,12 @@ def grupos_balanceados(fw: FloydWarshall,
     medoides = [nodos[i] for i in rng.choice(n, k, replace=False)]
 
     assign = None
+    pasos_realizados = 0
     espacios_total = sum(tamano)
 
     for _ in range(n_iter):
+        pasos_realizados += 1
+
         #construye columnas con tamaños de zonas
         cost = np.zeros((n, espacios_total))
         col_to_grupo = []
@@ -136,7 +139,7 @@ def grupos_balanceados(fw: FloydWarshall,
             for n1 in todos
         }
 
-    return grupos, depot_por_zona
+    return grupos, depot_por_zona, pasos_realizados
 
 
 def zonificar(fw, depots, entregas, max_nodos_por_zona, n_iter=100, seed=42):
@@ -144,7 +147,7 @@ def zonificar(fw, depots, entregas, max_nodos_por_zona, n_iter=100, seed=42):
     if n_zonas == 0:
         return {}, []
 
-    grupos, depot_por_zona = grupos_balanceados(
+    grupos, depot_por_zona,pasos_realizados = grupos_balanceados(
         fw, tamano, depots, nodos=entregas, n_iter=n_iter, seed=seed
     )
     nombres_zona = nombrar_zonas(depot_por_zona)
@@ -166,4 +169,4 @@ def zonificar(fw, depots, entregas, max_nodos_por_zona, n_iter=100, seed=42):
             "entregas": entregas_zona,
         })
 
-    return matrices, resumen
+    return matrices, resumen, pasos_realizados

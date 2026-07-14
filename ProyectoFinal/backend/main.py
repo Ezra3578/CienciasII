@@ -650,7 +650,7 @@ def _demo():
     max_nodos_por_zona = 4
 
     print(f"\n=== ZONIFICACIÓN (max_nodos_por_zona={max_nodos_por_zona}) ===")
-    matrices_zona, resumen_zonas = zonificar( fw, nombres_depots, nombres_entregas, max_nodos_por_zona)
+    matrices_zona, resumen_zonas,pasos_realizados = zonificar( fw, nombres_depots, nombres_entregas, max_nodos_por_zona)
 
     if not resumen_zonas:
         print("No se generaron zonas (revisar zonificar()).")

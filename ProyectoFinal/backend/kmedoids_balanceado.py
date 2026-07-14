@@ -145,7 +145,7 @@ def grupos_balanceados(fw: FloydWarshall,
 def zonificar(fw, depots, entregas, max_nodos_por_zona, n_iter=100, seed=42):
     n_zonas, tamano = calcular_zonas_y_tamanos(len(entregas), max_nodos_por_zona)
     if n_zonas == 0:
-        return {}, []
+        return {}, [], ''
 
     grupos, depot_por_zona,pasos_realizados = grupos_balanceados(
         fw, tamano, depots, nodos=entregas, n_iter=n_iter, seed=seed

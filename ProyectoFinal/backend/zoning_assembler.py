@@ -74,11 +74,10 @@ def construir_ruta_zona(
         if peso_desde_padre is not None:
             distancia_ida += peso_desde_padre
 
-        # Explorar vecinos que pertenezcan a la zona y no hayan sido visitados
         vecinos_del_nodo: dict[str, float] = adyacencia.get(nodo_actual, {})
         for nombre_vecino in sorted(vecinos_del_nodo.keys()):
             if nombre_vecino in nodos_de_la_zona and nombre_vecino not in nodos_visitados:
-                pila_dfs.append(nombre_vecino)
+              pila_dfs.append((nombre_vecino, vecinos_del_nodo[nombre_vecino]))
 
     # Cerrar el circuito: volver al depot al final de la ruta
     if orden_visita and orden_visita[0] == nombre_depot:

@@ -364,7 +364,7 @@ from zoning_assembler import construir_respuesta
 
 @app.post("/process", response_model=ProcessResponse)
 async def process_data_mst_bfs(datos: RequestData):
-     """
+    """
      Endpoint que usa zonificación por k-medoids, luego construye un MST
      por cada matriz de zona y, finalmente, aplica BFS sobre cada árbol
      para asignar los nodos a su depot de zona.
@@ -390,15 +390,16 @@ async def process_data_mst_bfs(datos: RequestData):
         if nodo.type in {"deploy", "delivery"}
     ]
 
-     if not nodos_depot:
+    if not nodos_depot:
         raise HTTPException(400, "Se necesita al menos un nodo tipo 'depot'.")
 
+
      # Agregar cada nodo al grafo lógico con sus coordenadas y rol
-     for nodo in nodos_depot:
+    for nodo in nodos_depot:
         grafo_logico.agregarNodo(
             nodo.name, nodo.latitude, nodo.longitude, role="depot"
         )
-     for nodo in nodos_delivery:
+    for nodo in nodos_delivery:
         grafo_logico.agregarNodo(
             nodo.name, nodo.latitude, nodo.longitude, role="deploy"
         )
@@ -406,13 +407,13 @@ async def process_data_mst_bfs(datos: RequestData):
      # Conectar cada depot con cada delivery (grafo bipartito) usando
      # distancia real por la red vial. También se conectan deliveries
      # entre sí para que Floyd-Warshall tenga caminos entre todos.
-     nombres_depots = [nodo.name for nodo in nodos_depot]
-     nombres_deliveries = [nodo.name for nodo in nodos_delivery]
-     grafo_logico.conectar_depots_con_entregas(nombres_depots, nombres_deliveries)
+    nombres_depots = [nodo.name for nodo in nodos_depot]
+    nombres_deliveries = [nodo.name for nodo in nodos_delivery]
+    grafo_logico.conectar_depots_con_entregas(nombres_depots, nombres_deliveries)
 
      # Conectar deliveries entre sí (todas las combinaciones) para que
      # la matriz de Floyd-Warshall tenga distancias entre todos los pares
-     for indice_i in range(len(nombres_deliveries)):
+    for indice_i in range(len(nombres_deliveries)):
          for indice_j in range(indice_i + 1, len(nombres_deliveries)):
              grafo_logico.agregarAristaAutomatica(
                 nombres_deliveries[indice_i],
@@ -423,30 +424,30 @@ async def process_data_mst_bfs(datos: RequestData):
      # ---- Paso 2: Floyd-Warshall ----
      # Se calcula la distancia más corta entre todo par de nodos lógicos.
      # Esta matriz se usa como base para la zonificación posterior.
-     floyd_warshall = FloydWarshall(grafo_logico)
-     floyd_warshall.calcularTodasLasDistancias()
+    floyd_warshall = FloydWarshall(grafo_logico)
+    floyd_warshall.calcularTodasLasDistancias()
 
      # ---- Paso 3: Zonificación por matriz de zona ----
      # Se invoca a zonificar para obtener, por cada zona, una matriz local
      # con las distancias entre sus nodos y el depot asignado a esa zona.
-     matrices_zona, resumen_zonas, pasos_realizados = zonificar(
+    matrices_zona, resumen_zonas, pasos_realizados = zonificar(
         floyd_warshall,
         nombres_depots,
         nombres_deliveries,
         datos.max_nodos_por_zona,
-     )
+    )
 
      # ---- Paso 4: MST por cada matriz de zona ----
      # Para cada zona, se toma su matriz local y se construye un MST que
      # conecte solo los nodos correspondientes a esa zona.
-     coordenadas_nodos = {
+    coordenadas_nodos = {
         nodo.name: (nodo.latitude, nodo.longitude)
         for nodo in datos.nodes
-     }
+    }
 
      # Se arma una asignación global de nodos a depots para poder calcular
      # la frontera de cada zona con un convex hull sobre sus nodos asignados.
-     zona_por_nodo_global = {}
+    zona_por_nodo_global = {}
     for zona_info in resumen_zonas:
         nombre_zona = zona_info["nombre"]
         depot_zona = zona_info["deposito"]
@@ -475,16 +476,16 @@ async def process_data_mst_bfs(datos: RequestData):
                 vistos.add(nombre_nodo)
 
         frontera_por_zona[nombre_zona] = frontera_zona
-     respuesta_final = {}
-     for indice, zona_info in enumerate(resumen_zonas, start=1):
+    respuesta_final = {}
+    for indice, zona_info in enumerate(resumen_zonas, start=1):
         nombre_zona = zona_info["nombre"]
         depot_zona = zona_info["deposito"]
         matriz_zona = matrices_zona[nombre_zona]
 
          # Se crea un grafo temporal solo con los nodos de esta zona para
          # poder construir el MST con coordenadas reales del request actual.
-         grafo_zona = GrafoLogico()
-         for nombre_nodo in matriz_zona.keys():
+        grafo_zona = GrafoLogico()
+        for nombre_nodo in matriz_zona.keys():
             latitud, longitud = grafo_logico.coordenadas[nombre_nodo]
             rol_nodo = grafo_logico.roles.get(nombre_nodo, "normal")
             grafo_zona.agregarNodo(nombre_nodo, latitud, longitud, role=rol_nodo)
@@ -504,7 +505,7 @@ async def process_data_mst_bfs(datos: RequestData):
          # ---- Paso 6: Ensamblado y respuesta final ----
          # Se reutiliza el ensamblador para devolver la estructura esperada
          # con frontera y ruta para cada región.
-         respuesta_parcial = construir_respuesta(
+        respuesta_parcial = construir_respuesta(
             {nodo: depot_zona for nodo in zona_por_nodo.keys()},
             {depot_zona: frontera_por_zona.get(nombre_zona,[])},
             grafo_mst_zona,
@@ -512,10 +513,10 @@ async def process_data_mst_bfs(datos: RequestData):
             [depot_zona],
          )
 
-         if respuesta_parcial:
+        if respuesta_parcial:
             respuesta_final[str(indice)] = respuesta_parcial["1"]
 
-     return respuesta_final
+    return respuesta_final
 
 app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
 

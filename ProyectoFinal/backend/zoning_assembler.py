@@ -20,12 +20,14 @@ def construir_ruta_zona(
     grafo_mst: GrafoLogico,
     nodos_de_la_zona: set[str],
     nombre_depot: str,
-) -> List[str]:
+) -> Tuple[List[str], float]:
     """
     Construye el orden de visita (ruta) de los nodos de una zona
     recorriendo el subgrafo del MST restringido a esos nodos, usando
     un DFS (Depth-First Search) desde el depot.
-
+    Ademas acumula la distancia real recorrida: cada arista del MST
+    que el DFS atraviesa se cuenta dos veces (ida y vuelta), ya que el
+    circuito cierra regresando al depot por el mismo arbol.
     El DFS garantiza un recorrido que sigue las ramas del árbol,
     visitando cada nodo exactamente una vez. Es la forma natural de
     "caminar" un árbol para hacer entregas.
@@ -42,11 +44,13 @@ def construir_ruta_zona(
     nombre_depot : str
         Nombre del depot desde donde inicia el recorrido.
 
-    Retorna
+    etorna
     -------
-    list[str]
-        Lista ordenada de nombres de nodos en el orden de visita.
-        El depot aparece al inicio y al final (circuito cerrado).
+    (orden_visita, distancia_metros)
+        - orden_visita: lista ordenada de nombres de nodos (depot al
+          inicio y al final).
+        - distancia_metros: metros totales recorridos (ida + vuelta)
+          sobre las aristas del MST de esta zona.
     """
 
     # Adyacencia del MST completo
@@ -55,16 +59,20 @@ def construir_ruta_zona(
     # Recorrido DFS restringido a los nodos de la zona
     orden_visita: List[str] = []
     nodos_visitados: set[str] = set()
-    pila_dfs: list[str] = [nombre_depot]
+    pila_dfs: list[tuple[str, float | None]] = [(nombre_depot, None)]
+    distancia_ida: float = 0.0
 
     while pila_dfs:
-        nodo_actual: str = pila_dfs.pop()
+        nodo_actual, peso_desde_padre = pila_dfs.pop()
 
         if nodo_actual in nodos_visitados:
             continue
 
         nodos_visitados.add(nodo_actual)
         orden_visita.append(nodo_actual)
+
+        if peso_desde_padre is not None:
+            distancia_ida += peso_desde_padre
 
         # Explorar vecinos que pertenezcan a la zona y no hayan sido visitados
         vecinos_del_nodo: dict[str, float] = adyacencia.get(nodo_actual, {})
@@ -76,7 +84,8 @@ def construir_ruta_zona(
     if orden_visita and orden_visita[0] == nombre_depot:
         orden_visita.append(nombre_depot)
 
-    return orden_visita
+    distancia_metros: float = distancia_ida * 2 
+    return orden_visita, distancia_metros
 
 
 def construir_respuesta(
@@ -116,7 +125,8 @@ def construir_respuesta(
     """
 
     respuesta: ProcessResponse = {}
-
+    distancia_total_km: float = 0.0
+    print("=== NODOS Y KILOMETROS POR ZONA ===")
     for indice, nombre_depot in enumerate(lista_depots, start=1):
         # Obtener todos los nodos asignados a este depot
         nodos_de_esta_zona: set[str] = {
@@ -126,10 +136,16 @@ def construir_respuesta(
         }
 
         # Construir el orden de visita (ruta) mediante DFS sobre el MST
-        orden_ruta: List[str] = construir_ruta_zona(
+        orden_ruta, distancia_metros = construir_ruta_zona(
             grafo_mst, nodos_de_esta_zona, nombre_depot
         )
-
+        #imprimir en kilometros y nodos
+        distancia_km = distancia_metros / 1000
+        distancia_total_km += distancia_km
+        print(
+            f"Zona '{nombre_depot}': {len(nodos_de_esta_zona)} nodos, "
+            f"{distancia_km:.2f} km recorridos"
+        )
         # Ensamblar el regionData con coordenadas reales
         # La clave de la zona se representa con un identificador numérico
         # secuencial, que el frontend puede leer fácilmente.
@@ -151,5 +167,5 @@ def construir_respuesta(
                 for nombre_nodo in orden_ruta
             ],
         )
-
+    print(f"=== TOTAL: {distancia_total_km:.2f} km recorridos en todas las zonas ===\n")
     return respuesta

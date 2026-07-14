@@ -429,7 +429,7 @@ async def process_data_mst_bfs(datos: RequestData):
      # ---- Paso 3: Zonificación por matriz de zona ----
      # Se invoca a zonificar para obtener, por cada zona, una matriz local
      # con las distancias entre sus nodos y el depot asignado a esa zona.
-     matrices_zona, resumen_zonas = zonificar(
+     matrices_zona, resumen_zonas, pasos_realizados = zonificar(
          floyd_warshall,
          nombres_depots,
          nombres_deliveries,

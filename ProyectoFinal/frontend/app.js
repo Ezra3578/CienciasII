@@ -254,6 +254,7 @@ function drawConvexHulls(regions) {
     if (coords.length > 2) {
       L.polygon(coords, {
         color: getZoneColor(regionId),
+        fillColor: getZoneColor(regionId),
         opacity: 0.4,
         fillOpacity: 0.1,
         weight: 3

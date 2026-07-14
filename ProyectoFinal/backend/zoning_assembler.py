@@ -80,7 +80,7 @@ def construir_ruta_zona(
               pila_dfs.append((nombre_vecino, vecinos_del_nodo[nombre_vecino]))
 
     # Cerrar el circuito: volver al depot al final de la ruta
-    if orden_visita and orden_visita[0] == nombre_depot:
+    if len(orden_visita) > 1 and orden_visita[0] == nombre_depot:
         orden_visita.append(nombre_depot)
 
     distancia_metros: float = distancia_ida * 2 

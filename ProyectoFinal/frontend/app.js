@@ -54,6 +54,7 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 // Datos
 let depots = [];          // { name, lat, lng, type: "depot" }
 let deliveries = [];      // { name, lat, lng, type: "deploy" }
+let isCtrlPressed = false;
 
 // Capas
 let markersLayer = L.layerGroup().addTo(map);
@@ -114,14 +115,15 @@ function redrawPoints() {
       deleteNode(dep);
     });
 
-    // Círculo de 200 m (azul claro)
-    L.circle([dep.lat, dep.lng], {
-      radius: 200,
-      color: '#5fbbd9',
-      fillColor: '#5fbbd9',
-      fillOpacity: 0.15,
-      weight: 1
-    }).addTo(depotCirclesLayer);
+    if (isCtrlPressed) {
+      L.circle([dep.lat, dep.lng], {
+        radius: 200,
+        color: '#5fbbd9',
+        fillColor: '#5fbbd9',
+        fillOpacity: 0.15,
+        weight: 1
+      }).addTo(depotCirclesLayer);
+    }
   });
 
   // Dibujar entregas
@@ -142,6 +144,11 @@ function redrawPoints() {
   });
 }
 
+function updateCtrlState(isPressed) {
+  isCtrlPressed = isPressed;
+  redrawPoints();
+}
+
 function deleteNode(node) {
   if (node.type === "depot") {
     depots = depots.filter(d => d.name !== node.name);
@@ -156,6 +163,18 @@ function deleteNode(node) {
 }
 
 // --- Eventos del mapa ---
+document.addEventListener("keydown", (e) => {
+  if (e.ctrlKey || e.metaKey) {
+    updateCtrlState(true);
+  }
+});
+
+document.addEventListener("keyup", (e) => {
+  if (!e.ctrlKey && !e.metaKey) {
+    updateCtrlState(false);
+  }
+});
+
 map.on("click", (e) => {
   const isCtrl = e.originalEvent.ctrlKey || e.originalEvent.metaKey;
   // Solo ignoramos el clic sobre un marcador si NO es para agregar depot
@@ -235,7 +254,8 @@ function drawConvexHulls(regions) {
     if (coords.length > 2) {
       L.polygon(coords, {
         color: getZoneColor(regionId),
-        fillOpacity: 0.2,
+        opacity: 0.4,
+        fillOpacity: 0.1,
         weight: 3
       }).addTo(hullsLayer).bindPopup(`Región ${regionId}`);
     }
